@@ -1,12 +1,12 @@
-import dam.connection.ConnectionFactory;
-import dam.connection.MongoConnection;
-import dam.connection.SqlConnection;
-import dam.query.SqlQuery;
-
 import java.util.List;
 
+import jorm.connection.ConnectionFactory;
+import jorm.connection.MongoConnection;
+import jorm.connection.SqlConnection;
+import jorm.query.SqlQuery;
+
 public class Application {
-    public static void main(String args[]){
+    public static void main(String args[]) {
         // Create SQL Connection
         SqlConnection sqlConnection = ConnectionFactory.createConnection(SqlConnection.class);
         // Create MongoDB Connection

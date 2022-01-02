@@ -1,15 +1,17 @@
-package dam.connection;
+package jorm.connection;
 
-
-import dam.query.SqlQuery;
-import java.sql.Connection;
 import java.sql.DriverManager;
 
-public class SqlConnection implements JORMConnection {
-    protected SqlConnection(){}
+import jorm.query.SqlQuery;
 
-    protected Connection connection;
+public class SqlConnection implements Connection {
+    protected SqlConnection() {
+
+    }
+
+    protected java.sql.Connection connection;
     protected String connectionURL = "jdbc:mysql://localhost:3306/damdatabase";
+
     @Override
     public void OpenConnection() {
         try{

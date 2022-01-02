@@ -1,9 +1,10 @@
-package dam.connection;
+package jorm.connection;
 
-import dam.query.Query;
+import jorm.query.Query;
 
-public interface JORMConnection {
+public interface Connection {
     public void OpenConnection();
     public void CloseConnection();
+
     public <T> Query<T> CreateQuery(Class userClass);
 }
