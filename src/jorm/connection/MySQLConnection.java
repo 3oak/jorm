@@ -14,49 +14,33 @@ public class MySQLConnection implements Connectable {
     @Override
     public void OpenConnection(String connectionURL)
             throws SQLException {
-        try {
-            connection = DriverManager.getConnection(connectionURL);
-        } catch (Exception ignore) {
-
-        }
+        connection = DriverManager.getConnection(connectionURL);
     }
 
     @Override
     public void OpenConnection(String connectionURL, String username, String password)
             throws SQLException {
-        try {
-            connection = DriverManager.getConnection(connectionURL, username, password);
-        } catch (Exception ignore) {
-
-        }
+        connection = DriverManager.getConnection(connectionURL, username, password);
     }
 
     @Override
     public void OpenConnection(Configuration configuration)
             throws SQLException {
-        try {
-            MySQLConfiguration _configuration = (MySQLConfiguration) configuration;
+        MySQLConfiguration _configuration = (MySQLConfiguration) configuration;
 
-            String connectionURL = _configuration.getConnectionURL();
-            String username = _configuration.username;
-            String password = _configuration.password;
+        String connectionURL = _configuration.getConnectionURL();
+        String username = _configuration.username;
+        String password = _configuration.password;
 
-            connection = DriverManager.getConnection(connectionURL, username, password);
-        } catch (Exception ignore) {
-
-        }
+        connection = DriverManager.getConnection(connectionURL, username, password);
     }
 
     @Override
-    public void CloseConnection() {
-        try {
-            if (connection == null || connection.isClosed())
-                return;
+    public void CloseConnection() throws SQLException {
+        if (connection == null || connection.isClosed())
+            return;
 
-            connection.close();
-        } catch (Exception ignore) {
-
-        }
+        connection.close();
     }
 
     @Override

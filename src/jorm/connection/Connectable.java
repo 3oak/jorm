@@ -15,7 +15,8 @@ public interface Connectable {
     void OpenConnection(Configuration configuration)
             throws SQLException;
 
-    void CloseConnection();
+    void CloseConnection()
+            throws SQLException;
 
     <T> Queriable<T> CreateQuery(Class userClass);
 }
