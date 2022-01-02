@@ -1,10 +1,9 @@
 package jorm.connection;
 
 import java.sql.DriverManager;
-
 import jorm.query.SqlQuery;
 
-public class SqlConnection implements Connection {
+public class SqlConnection implements Connectable {
     protected SqlConnection() {
 
     }

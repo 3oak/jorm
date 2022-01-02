@@ -2,7 +2,7 @@ package jorm.connection;
 
 import jorm.query.Query;
 
-public interface Connection {
+public interface Connectable {
     public void OpenConnection();
     public void CloseConnection();
 
