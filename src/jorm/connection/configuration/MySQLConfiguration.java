@@ -1,12 +1,12 @@
 package jorm.connection.configuration;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class MySQLConfiguration extends  Configuration {
     public String host = "localhost";
     public String port = "3306";
     public String database = "";
-    public HashMap<String, String> properties = new HashMap<String, String>();
+    public LinkedHashMap<String, String> properties = new LinkedHashMap<>();
 
     public MySQLConfiguration setHostName(String host) {
         this.host = host;
@@ -28,7 +28,7 @@ public class MySQLConfiguration extends  Configuration {
         return this;
     }
 
-    public MySQLConfiguration setProperties(HashMap<String, String> properties) {
+    public MySQLConfiguration setProperties(LinkedHashMap<String, String> properties) {
         this.properties.putAll(properties);
         return this;
     }
