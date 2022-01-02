@@ -9,6 +9,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface Column {
-    public String columnName() default "";
-    public String postfixGetterSetter() default "";
+    String columnName() default "";
+
+    String postfixGetterSetter() default "";
 }

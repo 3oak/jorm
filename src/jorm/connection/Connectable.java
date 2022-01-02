@@ -1,10 +1,21 @@
 package jorm.connection;
 
-import jorm.query.Query;
+import java.sql.SQLException;
+
+import jorm.connection.configuration.Configuration;
+import jorm.query.Queriable;
 
 public interface Connectable {
-    public void OpenConnection();
-    public void CloseConnection();
+    void OpenConnection(String connectionURL)
+            throws SQLException;
 
-    public <T> Query<T> CreateQuery(Class userClass);
+    void OpenConnection(String connectionURL, String username, String password)
+            throws SQLException;
+
+    void OpenConnection(Configuration configuration)
+            throws SQLException;
+
+    void CloseConnection();
+
+    <T> Queriable<T> CreateQuery(Class userClass);
 }

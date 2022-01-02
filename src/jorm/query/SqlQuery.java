@@ -7,11 +7,11 @@ import java.util.function.Predicate;
 
 import jorm.Mapper;
 
-public class SqlQuery<T> implements Query<T> {
+public class SqlQuery<T> implements Queriable<T> {
     private Mapper<T> mapper = null;
     private T genericData;
 
-    public SqlQuery(T genericData, Connection connection){
+    public SqlQuery(T genericData, Connection connection) {
         this.genericData = genericData;
         mapper = new Mapper(genericData);
     }

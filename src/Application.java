@@ -1,19 +1,46 @@
+import java.sql.SQLException;
 import java.util.List;
 
 import jorm.connection.ConnectionFactory;
-import jorm.connection.MongoConnection;
-import jorm.connection.SqlConnection;
+import jorm.connection.MySQLConnection;
+import jorm.connection.configuration.MySQLConfiguration;
 import jorm.query.SqlQuery;
 
 public class Application {
-    public static void main(String args[]) {
-        // Create SQL Connection
-        SqlConnection sqlConnection = ConnectionFactory.createConnection(SqlConnection.class);
-        // Create MongoDB Connection
-        //MongoConnection mongoConnection = ConnectionFactory.createConnection(MongoConnection.class);
+    public static void main(String[] args) {
+        // Create MySQL Connection
+        MySQLConnection connection = ConnectionFactory.createConnection(MySQLConnection.class);
+
+        // Connect to MySQL Database
+        try {
+            // --- Solution 1:
+            connection.OpenConnection(
+                    "jdbc:mysql://localhost:3306/sakila"
+            );
+
+            // --- Solution 2:
+            connection.OpenConnection(
+                    "jdbc:mysql://localhost:3306/sakila",
+                    "root", "root"
+            );
+
+            // --- Solution 3:
+            // Notice: Always ".setUsername" and ".setPassword" lastly
+            MySQLConfiguration _config = new MySQLConfiguration();
+            _config
+                    .setHostName("localhost")
+                    .setPort("3306")
+                    .setDatabaseName("sakila")
+                    .setProperty("profileSQL", "true");
+
+            connection.OpenConnection(_config);
+
+        } catch (Exception ignore) {
+
+        }
 
         // Create query from connection
-        SqlQuery<Character> sqlQuery = sqlConnection.CreateQuery(Character.class);
+        SqlQuery<Character> sqlQuery = connection.CreateQuery(Character.class);
         List<Character> characters = sqlQuery.ToList();
         for (Character item : characters) {
             System.out.println(item);
