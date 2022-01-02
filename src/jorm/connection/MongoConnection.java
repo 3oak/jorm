@@ -1,9 +1,11 @@
-package dam.connection;
+package jorm.connection;
 
-import dam.query.Query;
+import jorm.query.Query;
 
-public class MongoConnection implements JORMConnection {
-    protected MongoConnection(){}
+public class MongoConnection implements Connection {
+    protected MongoConnection() {
+
+    }
 
     @Override
     public void OpenConnection() {
