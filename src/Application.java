@@ -10,12 +10,12 @@ public class Application {
         // Create SQL Connection
         SqlConnection sqlConnection = ConnectionFactory.createConnection(SqlConnection.class);
         // Create MongoDB Connection
-        MongoConnection mongoConnection = ConnectionFactory.createConnection(MongoConnection.class);
+        //MongoConnection mongoConnection = ConnectionFactory.createConnection(MongoConnection.class);
 
         // Create query from connection
         SqlQuery<Character> sqlQuery = sqlConnection.CreateQuery(Character.class);
         List<Character> characters = sqlQuery.ToList();
-        for (var item : characters) {
+        for (Character item : characters) {
             System.out.println(item);
         }
     }

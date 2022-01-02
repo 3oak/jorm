@@ -2,7 +2,7 @@ package jorm.connection;
 
 import jorm.query.Query;
 
-public class MongoConnection implements Connection {
+public class MongoConnection implements Connectable {
     protected MongoConnection() {
 
     }
