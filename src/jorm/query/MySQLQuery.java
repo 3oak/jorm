@@ -6,17 +6,18 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
-
-import com.sun.xml.internal.messaging.saaj.packaging.mime.MessagingException;
 import jorm.Mapper;
+import jorm.clause.Clause;
 
-public class SqlQuery<T> implements Queriable<T> {
+public class MySQLQuery<T> implements Queriable<T> {
     private static Connection connection;
+
     private T genericData;
     private Mapper<T> mapper;
     private ArrayList<T> listData;
+    private String queryString;
 
-    public SqlQuery(T genericData, Connection connection) throws MessagingException {
+    public MySQLQuery(T genericData, Connection connection) throws RuntimeException {
         if(this.connection == null)
             this.connection = connection;
         this.genericData = genericData;
@@ -24,9 +25,8 @@ public class SqlQuery<T> implements Queriable<T> {
         this.listData = new ArrayList<T>();
     }
 
-
     @Override
-    public SqlQuery<T> SelectAll() {
+    public MySQLQuery<T> SelectAll() {
         ResultSet resultSet = null;
         try{
             if(resultSet == null)
@@ -42,17 +42,58 @@ public class SqlQuery<T> implements Queriable<T> {
     }
 
     @Override
-    public SqlQuery<T> Filter(Predicate<T> predicate) {
+    public Queriable<T> Where(Clause clauses) {
+        return null;
+    }
+
+    @Override
+    public Queriable<T> And(Clause clauses) {
+        return null;
+    }
+
+    @Override
+    public Queriable<T> Or(Clause clauses) {
+        return null;
+    }
+
+    public Queriable<T> Select(String column) {
+        return null;
+    }
+
+    @Override
+    public MySQLQuery<T> Filter(Predicate<T> predicate) {
+        return this;
+    }
+
+    @Override
+    public Queriable<T> InsertOrUpdate(T data) {
+        return null;
+    }
+
+    /**
+     * Update data to database
+     * @param data data to update
+     */
+    @Override
+    public Queriable<T> Update(T data) {
+        return null;
+    }
+
+    /**
+     * Insert persistent data to database
+     * @param data data to insert
+     */
+    @Override
+    public MySQLQuery<T> Insert(T data) {
         return this;
     }
 
     /**
-     * Save persistent data to database
-     * @param data data to save
+     * Execute command
      */
     @Override
-    public void Persist(T data) {
-
+    public Queriable<T> Execute() {
+        return this;
     }
 
     /**

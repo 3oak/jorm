@@ -4,10 +4,9 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import com.sun.xml.internal.messaging.saaj.packaging.mime.MessagingException;
 import jorm.connection.configuration.Configuration;
 import jorm.connection.configuration.MySQLConfiguration;
-import jorm.query.SqlQuery;
+import jorm.query.MySQLQuery;
 
 public class MySQLConnection implements Connectable {
     protected Connection connection;
@@ -45,7 +44,7 @@ public class MySQLConnection implements Connectable {
     }
 
     @Override
-    public <T> SqlQuery<T> CreateQuery(Class userClass) throws MessagingException {
-        return new SqlQuery(userClass, connection);
+    public <T> MySQLQuery<T> CreateQuery(Class userClass) throws RuntimeException {
+        return new MySQLQuery(userClass, connection);
     }
 }
