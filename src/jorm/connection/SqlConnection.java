@@ -1,6 +1,8 @@
 package jorm.connection;
 
 import java.sql.DriverManager;
+
+import com.sun.xml.internal.messaging.saaj.packaging.mime.MessagingException;
 import jorm.query.SqlQuery;
 
 public class SqlConnection implements Connectable {
@@ -28,7 +30,7 @@ public class SqlConnection implements Connectable {
     }
 
     @Override
-    public <T> SqlQuery<T> CreateQuery(Class userClass) {
+    public <T> SqlQuery<T> CreateQuery(Class userClass) throws MessagingException {
         return new SqlQuery(userClass, connection);
     }
 }

@@ -6,5 +6,20 @@ public class Character {
     @Column
     private String name;
     @Column
-    private int x;
+    private int level;
+
+    public Character(){}
+
+    public Character(String name, int level){
+        this.name = name;
+        this.level = level;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getLevel() {
+        return level;
+    }
 }
