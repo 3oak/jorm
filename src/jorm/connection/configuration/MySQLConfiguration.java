@@ -34,6 +34,16 @@ public class MySQLConfiguration extends  Configuration {
     }
 
     @Override
+    public MySQLConfiguration setUsername(String username) {
+        return (MySQLConfiguration) super.setUsername(username);
+    }
+
+    @Override
+    public MySQLConfiguration setPassword(String password) {
+        return (MySQLConfiguration) super.setUsername(password);
+    }
+
+    @Override
     public String getConnectionURL() {
         StringBuilder connectionURL =
                 new StringBuilder(String.format(
