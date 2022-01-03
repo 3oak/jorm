@@ -1,13 +1,7 @@
-import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 
-import com.sun.xml.internal.messaging.saaj.packaging.mime.MessagingException;
-import jorm.annotation.Column;
-import jorm.connection.ConnectionFactory;
-import jorm.connection.MySQLConnection;
 import jorm.connection.configuration.MySQLConfiguration;
-import jorm.query.SqlQuery;
 
 public class Application {
     public static void main(String[] args) {
@@ -68,5 +62,10 @@ public class Application {
         _config.setProperties(properties);
 
         System.out.println(_config.getConnectionURL());
+    }
+
+    public static void Test(){
+        ArrayList<Character> characters = new ArrayList<>();
+
     }
 }

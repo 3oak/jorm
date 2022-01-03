@@ -1,6 +1,5 @@
 package jorm;
 
-import com.sun.xml.internal.messaging.saaj.packaging.mime.MessagingException;
 import jorm.annotation.Column;
 import jorm.annotation.Table;
 
@@ -16,7 +15,7 @@ public class Mapper<T> {
     private String tableName;
     private HashMap<Field, String> fieldColumnMapper;
 
-    public Mapper(T genericData) throws MessagingException {
+    public Mapper(T genericData) throws RuntimeException {
         if(AnnotationValidationUtils.isTableAnnotationPresent(genericData)){
             throw new RuntimeException(String.format("%s does not have @Table Annotation", genericData.getClass()));
         }
