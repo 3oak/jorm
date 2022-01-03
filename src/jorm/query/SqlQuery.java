@@ -10,9 +10,8 @@ import java.util.function.Predicate;
 import com.sun.xml.internal.messaging.saaj.packaging.mime.MessagingException;
 import jorm.Mapper;
 
-public class SqlQuery<T> implements Query<T> {
+public class SqlQuery<T> implements Queriable<T> {
     private static Connection connection;
-
     private T genericData;
     private Mapper<T> mapper;
     private ArrayList<T> listData;

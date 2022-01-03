@@ -1,11 +1,23 @@
 package jorm.connection;
 
+import java.sql.SQLException;
+
 import com.sun.xml.internal.messaging.saaj.packaging.mime.MessagingException;
-import jorm.query.Query;
+import jorm.connection.configuration.Configuration;
+import jorm.query.Queriable;
 
 public interface Connectable {
-    public void OpenConnection();
-    public void CloseConnection();
+    void OpenConnection(String connectionURL)
+            throws SQLException;
 
-    public <T> Query<T> CreateQuery(Class userClass) throws MessagingException;
+    void OpenConnection(String connectionURL, String username, String password)
+            throws SQLException;
+
+    void OpenConnection(Configuration configuration)
+            throws SQLException;
+
+    void CloseConnection()
+            throws SQLException;
+
+    <T> Queriable<T> CreateQuery(Class userClass) throws MessagingException;
 }
