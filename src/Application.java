@@ -26,7 +26,6 @@ public class Application {
             );
 
             // --- Solution 3:
-            // Notice: Always ".setUsername" and ".setPassword" lastly
             MySQLConfiguration _config = new MySQLConfiguration();
             _config
                     .setHostName("localhost")
@@ -49,7 +48,11 @@ public class Application {
 
         MySQLConfiguration _config = new MySQLConfiguration();
         _config
-                .setHostName("localhost")
+                .setUsername("root")
+                .setPassword("root")
+                .setHostName("localhost");
+
+        _config
                 .setPort("3306")
                 .setDatabaseName("sakila")
                 .setProperty("key1", "value1")
