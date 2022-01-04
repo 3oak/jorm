@@ -12,19 +12,19 @@ public class Clause<TLeft, TRight> {
     }
     public static String ComparisonOperationToString(ComparisonOperation operation){
         switch (operation){
-            case Greater:
+            case GT:
                 return ">";
-            case GEqual:
+            case GEQ:
                 return ">=";
-            case Less:
+            case LT:
                 return "<";
-            case LEqual:
+            case LEQ:
                 return "<=";
-            case NotEqual:
+            case NE:
                 return "!=";
-            case Equal:
+            case E:
                 return "=";
-            case In:
+            case IN:
                 return "IN";
             default:
                 break;

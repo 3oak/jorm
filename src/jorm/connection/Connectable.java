@@ -3,7 +3,7 @@ package jorm.connection;
 import java.sql.SQLException;
 
 import jorm.connection.configuration.Configuration;
-import jorm.query.Queriable;
+import jorm.query.Queryable;
 
 public interface Connectable {
     void OpenConnection(String connectionURL)
@@ -18,5 +18,5 @@ public interface Connectable {
     void CloseConnection()
             throws SQLException;
 
-    <T> Queriable<T> CreateQuery(Class userClass) throws RuntimeException;
+    <T> Queryable<T> CreateQuery(Class<T> userClass) throws RuntimeException;
 }

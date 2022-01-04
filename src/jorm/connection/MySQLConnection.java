@@ -44,7 +44,7 @@ public class MySQLConnection implements Connectable {
     }
 
     @Override
-    public <T> MySQLQuery<T> CreateQuery(Class userClass) throws RuntimeException {
-        return new MySQLQuery(userClass, connection);
+    public <T> MySQLQuery<T> CreateQuery(Class<T> userClass) throws RuntimeException {
+        return new MySQLQuery<T>(userClass, connection);
     }
 }

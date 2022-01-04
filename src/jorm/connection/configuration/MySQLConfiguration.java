@@ -55,7 +55,7 @@ public class MySQLConfiguration extends  Configuration {
             int index = 0;
 
             for (var entry : this.properties.entrySet()) {
-                String property = "";
+                String property;
 
                 if (index == 0) {
                     property =
