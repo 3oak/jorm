@@ -32,6 +32,7 @@ CREATE TABLE `products` (
   `step_price` bigint unsigned NOT NULL DEFAULT '0',
   `shipping_info_id` int DEFAULT NULL,
   PRIMARY KEY (`product_id`),
+  UNIQUE KEY `unique_shipping_info` (`shipping_info_id`),
   KEY `FK_Product_Info` (`shipping_info_id`),
   FULLTEXT KEY `FULLTEXTSEARCH` (`name`),
   CONSTRAINT `FK_Product_Info` FOREIGN KEY (`shipping_info_id`) REFERENCES `productshippinginfo` (`id`)
@@ -57,4 +58,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-01-04  2:51:35
+-- Dump completed on 2022-01-04 12:04:08
