@@ -1,8 +1,7 @@
-import java.util.LinkedHashMap;
-
 import jorm.connection.ConnectionFactory;
 import jorm.connection.MySQLConnection;
 import jorm.connection.configuration.MySQLConfiguration;
+import jorm.query.MySQLQuery;
 
 public class Application {
     public static void main(String[] args) {
@@ -39,24 +38,30 @@ public class Application {
         // ** Create query from connection
         // MySQLQuery<Character> query = connection.CreateQuery(Character.class);
 
-        MySQLConnection connection = ConnectionFactory.createConnection(MySQLConnection.class);
+        MySQLConnection connection = ConnectionFactory.CreateConnection(MySQLConnection.class);
 
         MySQLConfiguration _config = new MySQLConfiguration();
         _config
-                .setUsername("root")
-                .setPassword("5091Nephilim7031;")
-                .setHostName("localhost");
+                .SetUsername("root")
+                .SetPassword("5091Nephilim7031;")
+                .SetHostName("localhost");
 
         _config
-                .setPort("3306")
-                .setDatabaseName("ouchtion");
+                .SetPort("3306")
+                .SetDatabaseName("ouchtion");
 
-        System.out.println(_config.getConnectionURL());
+        System.out.println(_config.GetConnectionURL());
 
         try {
             connection.OpenConnection(_config);
         } catch (Exception exception) {
             exception.printStackTrace();
         }
+
+        MySQLQuery<Character> query = connection.CreateQuery(Character.class);
+
+        Character samuel = new Character("Samuel", 100);
+
+        query.Insert(samuel);
     }
 }

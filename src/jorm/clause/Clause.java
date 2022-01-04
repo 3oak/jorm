@@ -1,24 +1,33 @@
 package jorm.clause;
 
-public class Clause{
+@SuppressWarnings("unused")
+public class Clause {
     protected String propertyName;
     protected ComparisonOperator comparisonOperation;
-    protected static String comparisonOperatorToString(ComparisonOperator operator){
-        switch (operator){
+
+    protected static String ComparisonOperatorToString(ComparisonOperator operator) {
+        switch (operator) {
             case Greater:
                 return ">";
-            case GEQ:
+            case GEqual:
                 return ">=";
-            case NE:
+            case Less:
+                return "<";
+            case LEqual:
+                return "<=";
+            case NotEqual:
                 return "!=";
-            case E:
+            case Equal:
                 return "=";
-            case IN:
+            case In:
                 return "IN";
             default:
                 break;
         }
         return null;
     }
-    public String toQueryStringClause() { return null; }
+
+    public String ToQueryStringClause() {
+        return null;
+    }
 }

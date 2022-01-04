@@ -1,16 +1,20 @@
 package jorm.query;
 
+import jorm.Mapper;
+import jorm.annotation.Table;
+import jorm.clause.Clause;
+
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
 
-import jorm.Mapper;
-import jorm.clause.Clause;
-
+@SuppressWarnings("unused")
 public class MySQLQuery<T> implements Queryable<T> {
     private static Connection connection;
 
@@ -53,17 +57,17 @@ public class MySQLQuery<T> implements Queryable<T> {
     }
 
     @Override
-    public Queryable<T> Where(Clause<?, ?> clauses) {
+    public MySQLQuery<T> Where(Clause clauses) {
         return null;
     }
 
     @Override
-    public Queryable<T> And(Clause<?, ?> clauses) {
+    public MySQLQuery<T> And(Clause clauses) {
         return null;
     }
 
     @Override
-    public Queryable<T> Or(Clause<?, ?> clauses) {
+    public MySQLQuery<T> Or(Clause clauses) {
         return null;
     }
 
@@ -73,28 +77,46 @@ public class MySQLQuery<T> implements Queryable<T> {
     }
 
     @Override
-    public Queryable<T> Insert(T data) {
+    public MySQLQuery<T> Insert(T dataObject) {
         // TODO:
         // - Consider relationship mapping annotation: 1-1; 1-n, n-1
         // - Add data to corresponding tables with appropriate constraints
+        // -- Insert function creates Query
+        // -- Query will be used by Executor to execute the query
+
+        // Insert data to its own table
+        Class<?> dataClass = dataObject.getClass();
+
+        Table tableAnnotation = dataClass.getAnnotation(Table.class);
+        String tableName = tableAnnotation.name().isBlank()?
+                dataClass.getName() : tableAnnotation.name();
+
+        Field[] dataFields = dataClass.getFields();
+        Table[] columns = dataClass.getAnnotationsByType(Table.class);
+
+        System.out.println(Arrays.toString(dataFields));
+        System.out.println(Arrays.toString(columns));
+
+        // Insert data to tables which have relationship with this table
+
+
+        return this;
+    }
+
+    @Override
+    public MySQLQuery<T> InsertOrUpdate(T data) {
+
 
         return null;
     }
 
     @Override
-    public Queryable<T> InsertOrUpdate(T data) {
-
-
+    public MySQLQuery<T> Update(T data) {
         return null;
     }
 
     @Override
-    public Queryable<T> Update(T data) {
-        return null;
-    }
-
-    @Override
-    public Queryable<T> Execute() {
+    public MySQLQuery<T> Execute() {
         return this;
     }
 

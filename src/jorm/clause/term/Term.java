@@ -1,5 +1,5 @@
 package jorm.clause.term;
 
-public interface Term<T> {
-    String toQueryString();
+public interface Term {
+    String ToQueryString();
 }

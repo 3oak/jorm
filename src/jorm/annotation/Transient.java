@@ -9,6 +9,6 @@ import java.lang.annotation.Target;
 @SuppressWarnings("unused")
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface ManyToOne {
+public @interface Transient {
 
 }
