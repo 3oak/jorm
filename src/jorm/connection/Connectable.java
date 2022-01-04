@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import jorm.connection.configuration.Configuration;
 import jorm.query.Queryable;
 
+@SuppressWarnings("unused")
 public interface Connectable {
     void OpenConnection(String connectionURL)
             throws SQLException;

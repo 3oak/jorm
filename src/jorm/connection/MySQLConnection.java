@@ -8,6 +8,7 @@ import jorm.connection.configuration.Configuration;
 import jorm.connection.configuration.MySQLConfiguration;
 import jorm.query.MySQLQuery;
 
+@SuppressWarnings({"unused"})
 public class MySQLConnection implements Connectable {
     protected Connection connection;
 

@@ -2,11 +2,16 @@ package jorm.connection;
 
 import java.lang.reflect.InvocationTargetException;
 
+@SuppressWarnings("unused")
 public class ConnectionFactory {
-    private ConnectionFactory() { }
+    private ConnectionFactory() {
+
+    }
+
     /* *** SINGLETON *** */
     protected static Connectable connection;
 
+    @SuppressWarnings("unchecked")
     public static <T extends Connectable> T createConnection(Class<T> connectionClass) {
         if (connection == null) {
             try {

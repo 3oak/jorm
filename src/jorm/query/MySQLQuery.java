@@ -7,8 +7,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
+
 import jorm.Mapper;
-import jorm.clause.Clause;
 
 public class MySQLQuery<T> implements Queryable<T> {
     private static Connection connection;
@@ -16,7 +16,6 @@ public class MySQLQuery<T> implements Queryable<T> {
     private Class<T> genericClass;
     private Mapper<T> mapper;
     private ArrayList<T> listData;
-    private String queryString;
 
     public MySQLQuery(Class<T> genericClass, Connection connection) throws RuntimeException {
         if(MySQLQuery.connection == null)
@@ -72,21 +71,15 @@ public class MySQLQuery<T> implements Queryable<T> {
     }
 
     /**
-     * Update data to database
-     * @param data data to update
+     * Save persistent data to database
+     *
+     * @param data data to save
      */
     @Override
     public Queryable<T> Update(T data) {
         return null;
     }
 
-    /**
-     * Insert persistent data to database
-     * @param data data to insert
-     */
-    @Override
-    public MySQLQuery<T> Insert(T data) {
-        return this;
     }
 
     /**
@@ -99,6 +92,7 @@ public class MySQLQuery<T> implements Queryable<T> {
 
     /**
      * Return list data with generic type
+     *
      * @return list data
      */
     @Override

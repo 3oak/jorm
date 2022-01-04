@@ -1,8 +1,5 @@
 package jorm;
 
-import jorm.annotation.Column;
-import jorm.annotation.Table;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.ResultSet;
@@ -10,6 +7,8 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
+import jorm.annotation.Column;
+import jorm.annotation.Table;
 
 public class Mapper<T> {
     private Class<T> genericClass;
@@ -24,11 +23,12 @@ public class Mapper<T> {
         this.tableName = genericClass.getDeclaredAnnotation(Table.class).tableName().isEmpty() ? genericClass.getName() : genericClass.getDeclaredAnnotation(Table.class).tableName();
         this.fieldColumnMapper = GenerateFieldColumnMapper();
     }
-    private HashMap<Field, String> GenerateFieldColumnMapper(){
+
+    private HashMap<Field, String> GenerateFieldColumnMapper() {
         HashMap<Field, String> mapper = new HashMap<>();
         for (Field field : genericClass.getDeclaredFields()) {
             String columnName = null;
-            if(field.isAnnotationPresent(Column.class))
+            if (field.isAnnotationPresent(Column.class))
                 columnName = field.getAnnotation(Column.class).columnName();
             mapper.put(field, columnName == null ? null : columnName.isEmpty() ? field.getName() : columnName);
         }
@@ -37,7 +37,7 @@ public class Mapper<T> {
     public T Map(ResultSet resultSet) throws InstantiationException, IllegalAccessException, SQLException, NoSuchFieldException, NoSuchMethodException, InvocationTargetException {
         T data = genericClass.getDeclaredConstructor().newInstance();
         for (Map.Entry<Field, String> item : fieldColumnMapper.entrySet()) {
-            if(item.getValue() == null)
+            if (item.getValue() == null)
                 continue;
             Object fieldData = resultSet.getObject(item.getValue());
             Field field = data.getClass().getDeclaredField(item.getKey().getName());

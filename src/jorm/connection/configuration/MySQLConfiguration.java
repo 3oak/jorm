@@ -2,6 +2,7 @@ package jorm.connection.configuration;
 
 import java.util.LinkedHashMap;
 
+@SuppressWarnings({"unused", "UnusedReturnValue"})
 public class MySQLConfiguration extends  Configuration {
     public String host = "localhost";
     public String port = "3306";

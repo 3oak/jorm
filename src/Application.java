@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import jorm.connection.configuration.MySQLConfiguration;
