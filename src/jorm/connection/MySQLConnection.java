@@ -50,4 +50,8 @@ public class MySQLConnection implements Connectable {
             throws RuntimeException {
         return new MySQLQuery<>(userClass, connection);
     }
+
+    public Connection getConnection() {
+        return connection;
+    }
 }
