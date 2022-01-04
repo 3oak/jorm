@@ -6,11 +6,10 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-@SuppressWarnings({"unused"})
+@SuppressWarnings("unused")
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface Column {
     String columnName() default "";
-
     String postfixGetterSetter() default "";
 }

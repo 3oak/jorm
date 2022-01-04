@@ -1,8 +1,7 @@
 package jorm.annotation;
 
-@SuppressWarnings({"unused"})
+@SuppressWarnings("unused")
 public @interface JoinColumn {
     String name() default "";
-
     boolean nullable() default false;
 }

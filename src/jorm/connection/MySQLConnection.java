@@ -8,7 +8,7 @@ import jorm.connection.configuration.Configuration;
 import jorm.connection.configuration.MySQLConfiguration;
 import jorm.query.MySQLQuery;
 
-@SuppressWarnings({"unused"})
+@SuppressWarnings("unused")
 public class MySQLConnection implements Connectable {
     protected Connection connection;
 
@@ -37,7 +37,8 @@ public class MySQLConnection implements Connectable {
     }
 
     @Override
-    public void CloseConnection() throws SQLException {
+    public void CloseConnection()
+            throws SQLException {
         if (connection == null || connection.isClosed())
             return;
 
@@ -45,7 +46,8 @@ public class MySQLConnection implements Connectable {
     }
 
     @Override
-    public <T> MySQLQuery<T> CreateQuery(Class<T> userClass) throws RuntimeException {
-        return new MySQLQuery<T>(userClass, connection);
+    public <T> MySQLQuery<T> CreateQuery(Class<T> userClass)
+            throws RuntimeException {
+        return new MySQLQuery<>(userClass, connection);
     }
 }

@@ -1,6 +1,6 @@
 package jorm.annotation;
 
-@SuppressWarnings({"unused"})
+@SuppressWarnings("unused")
 public @interface OneToOne {
 
 }

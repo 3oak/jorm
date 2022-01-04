@@ -62,9 +62,4 @@ public class Application {
 
         System.out.println(_config.getConnectionURL());
     }
-
-    public static void Test(){
-        ArrayList<Character> characters = new ArrayList<>();
-
-    }
 }
