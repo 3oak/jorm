@@ -1,24 +1,11 @@
 package jorm.clause;
 
-@SuppressWarnings("unused")
-public class Clause<TLeft, TRight> {
-    private final TLeft leftGenericType;
-    private final TRight rightGenericType;
-    private final ComparisonOperation comparisonOperation;
-
-    public Clause(TLeft leftGenericType, TRight rightGenericType, ComparisonOperation comparisonOperation) {
-        this.leftGenericType = leftGenericType;
-        this.rightGenericType = rightGenericType;
-        this.comparisonOperation = comparisonOperation;
-    }
-
-    public static String ComparisonOperationToString(ComparisonOperation operation) {
-        switch (operation) {
-            case LT:
-                return "<";
-            case LEQ:
-                return "<=";
-            case GT:
+public class Clause{
+    protected String propertyName;
+    protected ComparisonOperator comparisonOperation;
+    protected static String comparisonOperatorToString(ComparisonOperator operator){
+        switch (operator){
+            case Greater:
                 return ">";
             case GEQ:
                 return ">=";
@@ -33,8 +20,5 @@ public class Clause<TLeft, TRight> {
         }
         return null;
     }
-
-    public String toQueryStringClause() {
-        return null;
-    }
+    public String toQueryStringClause() { return null; }
 }
