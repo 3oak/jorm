@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import jorm.connection.configuration.MySQLConfiguration;
@@ -62,10 +61,5 @@ public class Application {
         _config.setProperties(properties);
 
         System.out.println(_config.getConnectionURL());
-    }
-
-    public static void Test(){
-        ArrayList<Character> characters = new ArrayList<>();
-
     }
 }

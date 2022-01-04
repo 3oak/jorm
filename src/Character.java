@@ -8,9 +8,11 @@ public class Character {
     @Column
     private int level;
 
-    public Character(){}
+    public Character() {
 
-    public Character(String name, int level){
+    }
+
+    public Character(String name, int level) {
         this.name = name;
         this.level = level;
     }

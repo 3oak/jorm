@@ -5,6 +5,7 @@ import jorm.clause.Clause;
 import java.util.List;
 import java.util.function.Predicate;
 
+@SuppressWarnings("unused")
 public interface Queryable<T> {
     Queryable<T> SelectAll();
 
@@ -16,11 +17,11 @@ public interface Queryable<T> {
 
     Queryable<T> Filter(Predicate<T> predicate);
 
+    Queryable<T> Insert(T data);
+
     Queryable<T> InsertOrUpdate(T data);
 
     Queryable<T> Update(T data);
-
-    Queryable<T> Insert(T data);
 
     Queryable<T> Execute();
 

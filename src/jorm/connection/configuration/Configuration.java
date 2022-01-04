@@ -1,5 +1,6 @@
 package jorm.connection.configuration;
 
+@SuppressWarnings({"unused", "UnusedReturnValue"})
 public abstract class Configuration {
     public String username = "root";
     public String password = "root";
