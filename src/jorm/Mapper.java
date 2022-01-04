@@ -10,6 +10,7 @@ import java.util.HashMap;
 import jorm.annotation.Table;
 import jorm.annotation.Column;
 
+@SuppressWarnings("unused")
 public class Mapper<T> {
     private final Class<T> genericClass;
     private final String tableName;
@@ -17,12 +18,14 @@ public class Mapper<T> {
 
     public Mapper(Class<T> genericClass)
             throws RuntimeException {
-        if (genericClass.isAnnotationPresent(Table.class)) {
+        if (!AnnotationValidationUtils.IsTableAnnotationPresent(genericClass)) {
             throw new RuntimeException(String.format("%s does not have @Table Annotation", genericClass.getName()));
         }
 
         this.genericClass = genericClass;
-        this.tableName = genericClass.getDeclaredAnnotation(Table.class).tableName().isEmpty() ? genericClass.getName() : genericClass.getDeclaredAnnotation(Table.class).tableName();
+        this.tableName =
+                genericClass.getDeclaredAnnotation(Table.class).name().isEmpty() ?
+                        genericClass.getName() : genericClass.getDeclaredAnnotation(Table.class).name();
         this.fieldColumnMapper = GenerateFieldColumnMapper();
     }
 
@@ -33,7 +36,7 @@ public class Mapper<T> {
             String columnName = null;
 
             if (field.isAnnotationPresent(Column.class))
-                columnName = field.getAnnotation(Column.class).columnName();
+                columnName = field.getAnnotation(Column.class).name();
 
             mapper.put(field, columnName == null ? null : columnName.isEmpty() ? field.getName() : columnName);
         }

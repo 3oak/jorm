@@ -10,52 +10,77 @@ import jorm.query.Queryable;
 @SuppressWarnings("unused")
 public abstract class Connectable {
     protected Connection connection;
+
     protected String connectionURL;
     protected String username;
     protected String password;
 
-    public Connectable(String connectionURL) {
-        this.connectionURL = connectionURL;
-    }
-
-    public Connectable(String connectionURL, String username, String password) {
-        this.connectionURL = connectionURL;
-        this.username = username;
-        this.password = password;
-    }
-
-    public Connectable(Configuration configuration) {
-    }
-
-    protected void OpenConnection() throws SQLException {
+    private void OpenConnectionWithHost()
+            throws SQLException {
         connection = DriverManager.getConnection(connectionURL, username, password);
     }
 
-    protected void CloseConnection() throws SQLException {
-        if (connection == null || connection.isClosed())
-            return;
-
-        connection.close();
+    private void OpenConnectionWithoutHost()
+            throws SQLException {
+        connection = DriverManager.getConnection(connectionURL);
     }
 
-    protected boolean ValidateSchema() {
+    private boolean IsValidSchema() {
         // TODO: Implement this
         return true;
     }
 
-    /* *** TEMPLATE METHOD *** */
-    public void SetUpConnection() throws SQLException {
-        OpenConnection();
-        if (!ValidateSchema()) {
+    private void ValidateConnection()
+            throws SQLException {
+        if (!IsValidSchema()) {
             CloseConnection();
             // TODO: Add new custom exception
             throw new RuntimeException("Database validation failed.");
         }
     }
 
-    abstract public <T> Queryable<T> CreateQuery(Class<T> userClass) throws RuntimeException;
+    public abstract <T> Queryable<T> CreateQuery(Class<T> userClass)
+            throws RuntimeException;
 
-    public Connection getConnection() {
+    public Connection GetConnection() {
         return connection;
+    }
+
+    /* *** TEMPLATE METHOD *** */
+    public void OpenConnection(String connectionURL)
+            throws SQLException {
+        this.connectionURL = connectionURL;
+
+        OpenConnectionWithoutHost();
+        ValidateConnection();
+    }
+
+    public void OpenConnection(String connectionURL, String username, String password)
+            throws SQLException {
+        this.connectionURL = connectionURL;
+        this.username = username;
+        this.password = password;
+
+        OpenConnectionWithHost();
+        ValidateConnection();
+    }
+
+    public void OpenConnection(Configuration configuration)
+            throws SQLException {
+        this.connectionURL = configuration.GetConnectionURL();
+        this.username = configuration.username;
+        this.password = configuration.password;
+
+        OpenConnectionWithHost();
+        ValidateConnection();
+    }
+    /* *********************** */
+
+    public void CloseConnection()
+            throws SQLException {
+        if (connection == null || connection.isClosed())
+            return;
+
+        connection.close();
     }
 }

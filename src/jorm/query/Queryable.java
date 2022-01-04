@@ -5,15 +5,15 @@ import jorm.clause.Clause;
 import java.util.List;
 import java.util.function.Predicate;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "UnusedReturnValue"})
 public interface Queryable<T> {
     Queryable<T> SelectAll();
 
-    Queryable<T> Where(Clause<?, ?> clauses);
+    Queryable<T> Where(Clause clauses);
 
-    Queryable<T> And(Clause<?, ?> clauses);
+    Queryable<T> And(Clause clauses);
 
-    Queryable<T> Or(Clause<?, ?> clauses);
+    Queryable<T> Or(Clause clauses);
 
     Queryable<T> Filter(Predicate<T> predicate);
 
