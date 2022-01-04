@@ -3,6 +3,7 @@ package jorm.query;
 import jorm.Mapper;
 import jorm.annotation.Table;
 import jorm.clause.Clause;
+import jorm.executor.Executor;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -21,6 +22,9 @@ public class MySQLQuery<T> implements Queryable<T> {
     private final Class<T> genericClass;
     private final Mapper<T> mapper;
     private final ArrayList<T> dataList;
+
+    // TODO: Set the correct strategy
+    private final Executor executor = null;
 
     public MySQLQuery(Class<T> genericClass, Connection connection)
             throws RuntimeException {
