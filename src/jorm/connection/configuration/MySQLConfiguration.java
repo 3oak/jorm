@@ -41,7 +41,7 @@ public class MySQLConfiguration extends  Configuration {
 
     @Override
     public MySQLConfiguration setPassword(String password) {
-        return (MySQLConfiguration) super.setUsername(password);
+        return (MySQLConfiguration) super.setPassword(password);
     }
 
     @Override
