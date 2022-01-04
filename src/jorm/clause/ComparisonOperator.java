@@ -1,6 +1,6 @@
 package jorm.clause;
 
-public enum ComparisonOperation {
+public enum ComparisonOperator {
     Less,
     LEqual,
     Greater,
