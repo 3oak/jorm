@@ -1,57 +1,30 @@
 package jorm.connection;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-
 import jorm.connection.configuration.Configuration;
 import jorm.connection.configuration.MySQLConfiguration;
 import jorm.query.MySQLQuery;
 
 @SuppressWarnings("unused")
-public class MySQLConnection implements Connectable {
-    protected Connection connection;
-
-    @Override
-    public void OpenConnection(String connectionURL)
-            throws SQLException {
-        connection = DriverManager.getConnection(connectionURL);
+public class MySQLConnection extends Connectable {
+    public MySQLConnection(String url) {
+        super(url);
     }
 
-    @Override
-    public void OpenConnection(String connectionURL, String username, String password)
-            throws SQLException {
-        connection = DriverManager.getConnection(connectionURL, username, password);
+    public MySQLConnection(String connectionURL, String username, String password) {
+        super(connectionURL, username, password);
     }
 
-    @Override
-    public void OpenConnection(Configuration configuration)
-            throws SQLException {
+    public MySQLConnection(Configuration configuration) {
+        super(configuration);
+
         MySQLConfiguration _configuration = (MySQLConfiguration) configuration;
-
-        String connectionURL = _configuration.getConnectionURL();
-        String username = _configuration.username;
-        String password = _configuration.password;
-
-        connection = DriverManager.getConnection(connectionURL, username, password);
+        this.connectionURL = _configuration.getConnectionURL();
+        this.username = _configuration.username;
+        this.password = _configuration.password;
     }
 
     @Override
-    public void CloseConnection()
-            throws SQLException {
-        if (connection == null || connection.isClosed())
-            return;
-
-        connection.close();
-    }
-
-    @Override
-    public <T> MySQLQuery<T> CreateQuery(Class<T> userClass)
-            throws RuntimeException {
+    public <T> MySQLQuery<T> CreateQuery(Class<T> userClass) throws RuntimeException {
         return new MySQLQuery<>(userClass, connection);
-    }
-
-    public Connection getConnection() {
-        return connection;
     }
 }
