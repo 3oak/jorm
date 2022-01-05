@@ -30,3 +30,4 @@ public interface Queryable<T> {
 
     List<T> ToList();
 }
+
