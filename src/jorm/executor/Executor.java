@@ -2,17 +2,16 @@ package jorm.executor;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Queue;
 
 @SuppressWarnings("unused")
 public abstract class Executor {
-    protected String query;
     protected Connection connection;
 
-    public Executor(String query, Connection connection) {
-        this.query = query;
+    public Executor(Connection connection) {
         this.connection = connection;
     }
 
-    public abstract <T> T execute()
+    public abstract <T> T execute(Queue<String> queries)
             throws SQLException;
 }

@@ -3,18 +3,19 @@ package jorm.executor;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Queue;
 
 @SuppressWarnings("unused")
 public class NonQueryExecutor extends Executor {
-    public NonQueryExecutor(String query, Connection connection) {
-        super(query, connection);
+    public NonQueryExecutor(Connection connection) {
+        super(connection);
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public Integer execute()
+    public Integer execute(Queue<String> queries)
             throws SQLException {
         Statement statement = connection.createStatement();
-        return statement.executeUpdate(query);
+        return statement.executeUpdate(null);
     }
 }
