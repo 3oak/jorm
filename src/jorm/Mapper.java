@@ -4,9 +4,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.*;
 
 import jorm.annotation.Table;
 import jorm.annotation.Column;
@@ -20,6 +18,7 @@ public class Mapper<T> {
     private final HashMap<Field, String> fieldColumnDictionary;
 
     private Executor executor = null;
+    private final LinkedList<String> queries = new LinkedList<>();
 
     public Mapper(Class<T> genericClass)
             throws RuntimeException {
@@ -75,35 +74,70 @@ public class Mapper<T> {
         return data;
     }
 
-    private Integer InsertSelf(T dataObject) {
-        Class<?> dataClass = dataObject.getClass();
+    private String InsertSelf(T dataObject)
+            throws IllegalAccessException {
+        int from, to;
+        String
+                keywordTable = "table",
+                keywordColumn = "columns",
+                keywordValues = "values";
 
-        Table tableAnnotation = dataClass.getAnnotation(Table.class);
-        String tableName = tableAnnotation.name().isBlank()?
-                dataClass.getName() : tableAnnotation.name();
+        /* ---------------------------------------------------------------- */
+        StringBuilder queryStringBuilder =
+                new StringBuilder(
+                        "INSERT INTO " + keywordTable + " (" + keywordColumn + ") " +
+                        "VALUES (" + keywordValues + ")"
+                );
 
-        Field[] dataFields = dataClass.getFields();
-        Table[] columns = dataClass.getAnnotationsByType(Table.class);
+        /* ---------------------------------------------------------------- */
+        // TABLE
+        from = queryStringBuilder.indexOf(keywordTable);
+        to = from + keywordTable.length();
+        queryStringBuilder.replace(from, to, tableName);
 
-        System.out.println(Arrays.toString(dataFields));
-        System.out.println(Arrays.toString(columns));
+        /* ---------------------------------------------------------------- */
+        // COLUMNS & VALUES
+        StringBuilder columnStringBuilder = new StringBuilder();
+        StringBuilder valueStringBuilder = new StringBuilder();
 
-        return 0;
+        int index = 0;
+        for (var pairFieldColumn : this.fieldColumnDictionary.entrySet()) {
+            if (pairFieldColumn.getValue() == null) continue;
+
+            if (index != 0) {
+                columnStringBuilder.append(", ");
+                valueStringBuilder.append(", ");
+            }
+
+            Field field = pairFieldColumn.getKey();
+            String column = pairFieldColumn.getValue();
+
+            field.setAccessible(true);
+
+            columnStringBuilder.append(column);
+            valueStringBuilder.append(field.get(dataObject).toString());
+
+            index++;
+        }
+
+        // TODO: Datetime process here!
+
+        from = queryStringBuilder.indexOf(keywordColumn);
+        to = from + keywordColumn.length();
+        queryStringBuilder.replace(from, to, columnStringBuilder.toString());
+
+        from = queryStringBuilder.indexOf(keywordValues);
+        to = from + keywordValues.length();
+        queryStringBuilder.replace(from, to, valueStringBuilder.toString());
+
+        return queryStringBuilder.toString();
     }
 
-    private Integer InsertRelatives(T dataObject) {
-        return 0;
-    }
+    public void Insert(T dataObject)
+            throws IllegalAccessException {
+        queries.clear();
+        queries.add(InsertSelf(dataObject));
 
-    public String Insert(T dataObject) {
-        StringBuilder stringBuilder = new StringBuilder();
-
-        // Insert data to its own table
-        InsertSelf(dataObject);
-
-        // Insert data to tables which have relationship with this table
-        InsertRelatives(dataObject);
-
-        return "";
+        // TODO: Use Executor here!
     }
 }

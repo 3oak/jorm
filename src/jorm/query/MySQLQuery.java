@@ -77,7 +77,8 @@ public class MySQLQuery<T> implements Queryable<T> {
     }
 
     @Override
-    public MySQLQuery<T> Insert(T dataObject) {
+    public MySQLQuery<T> Insert(T dataObject)
+            throws IllegalAccessException {
         // TODO:
         // - Inject data values into its own table
         // - Consider relationship mapping annotation: 1-1; 1-n, n-1
@@ -85,8 +86,7 @@ public class MySQLQuery<T> implements Queryable<T> {
         // -- Insert function that creates Query
         // -- Query will be used by Executor to execute the query
 
-        var message = mapper.Insert(dataObject);
-        System.out.println(message);
+        mapper.Insert(dataObject);
 
         return this;
     }

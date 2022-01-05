@@ -17,7 +17,8 @@ public interface Queryable<T> {
 
     Queryable<T> Filter(Predicate<T> predicate);
 
-    Queryable<T> Insert(T data);
+    Queryable<T> Insert(T data)
+            throws IllegalAccessException;
 
     Queryable<T> InsertOrUpdate(T data);
 

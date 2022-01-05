@@ -12,6 +12,6 @@ public abstract class Executor {
         this.connection = connection;
     }
 
-    public abstract <T> T execute(Queue<String> queries)
+    public abstract Object execute(Queue<String> queries)
             throws SQLException;
 }

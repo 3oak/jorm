@@ -1,6 +1,7 @@
 package jorm.executor;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Queue;
@@ -11,11 +12,10 @@ public class QueryExecutor extends Executor {
         super(connection);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public <T> T execute(Queue<String> queries)
+    public ResultSet execute(Queue<String> queries)
             throws SQLException {
         Statement statement = connection.createStatement();
-        return (T) statement.executeQuery(null);
+        return statement.executeQuery(null);
     }
 }
