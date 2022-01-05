@@ -1,17 +1,14 @@
 package jorm.query;
 
 import jorm.Mapper;
-import jorm.annotation.Table;
 import jorm.clause.Clause;
 import jorm.executor.Executor;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -20,11 +17,9 @@ public class MySQLQuery<T> implements Queryable<T> {
     private static Connection connection;
 
     private final Class<T> genericClass;
+
     private final Mapper<T> mapper;
     private final ArrayList<T> dataList;
-
-    // TODO: Set the correct strategy
-    private final Executor executor = null;
 
     public MySQLQuery(Class<T> genericClass, Connection connection)
             throws RuntimeException {
@@ -32,6 +27,7 @@ public class MySQLQuery<T> implements Queryable<T> {
             MySQLQuery.connection = connection;
 
         this.genericClass = genericClass;
+
         this.mapper = new Mapper<>(genericClass);
         this.dataList = new ArrayList<>();
     }
@@ -46,7 +42,7 @@ public class MySQLQuery<T> implements Queryable<T> {
             if (resultSet == null)
                 throw new RuntimeException(String.format("%s: Database load fail", genericClass.getName()));
             while (resultSet.next()) {
-                T data = mapper.Map(resultSet);
+                T data = mapper.ToDataObject(resultSet);
                 dataList.add(data);
             }
         } catch (SQLException
@@ -83,26 +79,14 @@ public class MySQLQuery<T> implements Queryable<T> {
     @Override
     public MySQLQuery<T> Insert(T dataObject) {
         // TODO:
+        // - Inject data values into its own table
         // - Consider relationship mapping annotation: 1-1; 1-n, n-1
         // - Add data to corresponding tables with appropriate constraints
-        // -- Insert function creates Query
+        // -- Insert function that creates Query
         // -- Query will be used by Executor to execute the query
 
-        // Insert data to its own table
-        Class<?> dataClass = dataObject.getClass();
-
-        Table tableAnnotation = dataClass.getAnnotation(Table.class);
-        String tableName = tableAnnotation.name().isBlank()?
-                dataClass.getName() : tableAnnotation.name();
-
-        Field[] dataFields = dataClass.getFields();
-        Table[] columns = dataClass.getAnnotationsByType(Table.class);
-
-        System.out.println(Arrays.toString(dataFields));
-        System.out.println(Arrays.toString(columns));
-
-        // Insert data to tables which have relationship with this table
-
+        var message = mapper.Insert(dataObject);
+        System.out.println(message);
 
         return this;
     }

@@ -10,9 +10,11 @@ public class NonQueryExecutor extends Executor {
         super(query, connection);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public <T> T execute() throws SQLException {
+    public Integer execute()
+            throws SQLException {
         Statement statement = connection.createStatement();
-        return (T) Integer.valueOf(statement.executeUpdate(query));
+        return statement.executeUpdate(query);
     }
 }
