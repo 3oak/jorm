@@ -2,6 +2,7 @@ import jorm.connection.ConnectionFactory;
 import jorm.connection.MySQLConnection;
 import jorm.connection.configuration.MySQLConfiguration;
 import jorm.query.MySQLQuery;
+import jorm.query.refactor_query.Queryable;
 
 public class Application {
     public static void main(String[] args)
@@ -64,5 +65,7 @@ public class Application {
         Character samuel = new Character("Samuel", 100);
 
         query.Insert(samuel);
+
+        Queryable queryable = new Queryable().Select().Where().Or().Run();
     }
 }
