@@ -1,8 +1,6 @@
 package jorm.connection;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
 
 import jorm.connection.configuration.Configuration;
 import jorm.query.Queryable;
@@ -25,20 +23,6 @@ public abstract class Connectable {
         connection = DriverManager.getConnection(connectionURL);
     }
 
-    private boolean IsValidSchema() {
-        // TODO: Implement this
-        return true;
-    }
-
-    private void ValidateConnection()
-            throws SQLException {
-        if (!IsValidSchema()) {
-            CloseConnection();
-            // TODO: Add new custom exception
-            throw new RuntimeException("Database validation failed.");
-        }
-    }
-
     public abstract <T> Queryable<T> CreateQuery(Class<T> userClass)
             throws RuntimeException;
 
@@ -52,7 +36,6 @@ public abstract class Connectable {
         this.connectionURL = connectionURL;
 
         OpenConnectionWithoutHost();
-        ValidateConnection();
     }
 
     public void OpenConnection(String connectionURL, String username, String password)
@@ -62,7 +45,6 @@ public abstract class Connectable {
         this.password = password;
 
         OpenConnectionWithHost();
-        ValidateConnection();
     }
 
     public void OpenConnection(Configuration configuration)
@@ -72,7 +54,6 @@ public abstract class Connectable {
         this.password = configuration.password;
 
         OpenConnectionWithHost();
-        ValidateConnection();
     }
     /* *********************** */
 

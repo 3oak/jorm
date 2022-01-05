@@ -8,14 +8,14 @@ import java.sql.SQLException;
 @SuppressWarnings("unused")
 public class Utils {
 
-    public boolean ValidateTable(Connection connection)
+    public boolean GetAllTables(Connection connection)
             throws SQLException {
         DatabaseMetaData databaseMetaData = connection.getMetaData();
         String[] types = {"TABLE"};
 
-        ResultSet tablesList = databaseMetaData.getTables(null, null, "%", types);
-        while (tablesList.next()) {
-            System.out.println(tablesList.getString("TABLE_NAME"));
+        ResultSet tables = databaseMetaData.getTables(null, "PUBLIC", null, types);
+        while (tables.next()) {
+            System.out.println(tables.getString("TABLE_NAME"));
         }
 
         return true;
