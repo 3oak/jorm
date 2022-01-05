@@ -11,7 +11,6 @@ public class NonQueryExecutor extends Executor {
         super(connection);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Integer execute(Queue<String> queries)
             throws SQLException {

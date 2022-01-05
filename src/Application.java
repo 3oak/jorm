@@ -4,7 +4,8 @@ import jorm.connection.configuration.MySQLConfiguration;
 import jorm.query.MySQLQuery;
 
 public class Application {
-    public static void main(String[] args) {
+    public static void main(String[] args)
+            throws IllegalAccessException {
         // ** Create MySQL Connection
         // MySQLConnection connection = ConnectionFactory.createConnection(MySQLConnection.class);
 
