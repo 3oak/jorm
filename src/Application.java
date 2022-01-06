@@ -6,9 +6,11 @@ import jorm.connection.ConnectionFactory;
 import jorm.connection.MySQLConnection;
 import jorm.connection.configuration.MySQLConfiguration;
 import jorm.query.MySQLQuery;
+import jorm.query.refactor_query.Queryable;
 
 public class Application {
-    public static void main(String[] args) {
+    public static void main(String[] args)
+            throws IllegalAccessException {
         // ** Create MySQL Connection
         // MySQLConnection connection = ConnectionFactory.createConnection(MySQLConnection.class);
 
