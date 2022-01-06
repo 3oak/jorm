@@ -5,5 +5,6 @@ public enum QueryType {
     SELECT,
     WHERE,
     INSERT,
-    UPDATE
+    UPDATE,
+    DELETE
 }

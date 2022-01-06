@@ -70,6 +70,6 @@ public class Application {
 
         query.Insert(samuel);
 
-        Queryable queryable = new Queryable().Select().Where().Or().Run();
+        // Queryable queryable = new Queryable().Select().Where().Or().Run();
     }
 }

@@ -22,6 +22,9 @@ public interface Queryable<T> {
     Queryable<T> Insert(T data)
             throws Exception;
 
+    Queryable<T> Delete(T data)
+            throws Exception;
+
     Queryable<T> InsertOrUpdate(T data);
 
     Queryable<T> Update(T data);

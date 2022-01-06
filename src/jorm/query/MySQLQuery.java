@@ -123,6 +123,18 @@ public class MySQLQuery<T> implements Queryable<T> {
     }
 
     @Override
+    public Queryable<T> Delete(T data) {
+        command.AddCommand(
+                Tuple.CreateTuple(
+                        QueryType.DELETE,
+                        String.format("delete from %s", mapper.GetTableName())
+                )
+        );
+
+        return this;
+    }
+
+    @Override
     public Queryable<T> InsertOrUpdate(T data) {
         return null;
     }

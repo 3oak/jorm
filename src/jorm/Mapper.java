@@ -137,6 +137,41 @@ public class Mapper<T> {
 
         // TODO: Use Executor here!
     }
+    
+//    public void Delete(T dataObject)
+//            throws IllegalAccessException {
+//        queries.clear();
+//        queries.add(DeleteFromDatabase(dataObject));
+//
+//
+//    }
+//
+//    private String DeleteFromDatabase(T dataObject)
+//            throws IllegalAccessException {
+//
+//        int from, to;
+//        String
+//                keywordTable = "table",
+//                keywordCondition = "conditions";
+//
+//        /* ---------------------------------------------------------------- */
+//        // Query String
+//        StringBuilder queryStringBuilder = new StringBuilder(
+//                "DELETE FROM" + keywordTable + " WHERE " +  keywordCondition
+//        );
+//
+//        /* ---------------------------------------------------------------- */
+//        // TABLE
+//        from = queryStringBuilder.indexOf(keywordTable);
+//        to = from + keywordTable.length();
+//        queryStringBuilder.replace(from, to, tableName);
+//
+//        /* ---------------------------------------------------------------- */
+//
+//        // CONDITION
+//
+//        return queryStringBuilder.toString();
+//    }
 
     public String GetTableName() {
         return tableName;
