@@ -31,6 +31,8 @@ public interface Queryable<T> {
 
     Queryable<T> Execute();
 
+    Queryable<T> Pick(String[] fields);
+
     List<T> ToList();
 }
 

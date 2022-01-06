@@ -154,6 +154,18 @@ public class MySQLQuery<T> implements Queryable<T> {
     }
 
     @Override
+    public Queryable<T> Pick(String[] fields) {
+        String picker = String.join(", ", fields);
+        command.AddCommand(
+                Tuple.CreateTuple(
+                        QueryType.FIELDS,
+                        String.format("%s", picker)
+                )
+        );
+        return this;
+    }
+
+    @Override
     public List<T> ToList() {
         return dataList;
     }
