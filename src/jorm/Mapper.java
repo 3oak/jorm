@@ -132,4 +132,8 @@ public class Mapper<T> {
 
         // TODO: Use Executor here!
     }
+    
+    public String getTableName() {
+        return tableName;
+    }
 }

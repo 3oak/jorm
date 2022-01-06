@@ -63,7 +63,13 @@ public class Application {
         } catch (Exception exception) {
             exception.printStackTrace();
         }
-        MySQLQuery<Character> mySQLQuery = connection.CreateQuery(Character.class);
-        mySQLQuery.SelectAll().Where(Expression.simpleBinomialClause("name", ComparisonOperator.Equal, 1)).Execute();
+
+        MySQLQuery<Character> query = connection.CreateQuery(Character.class);
+
+        Character samuel = new Character("Samuel", 100);
+
+        query.Insert(samuel);
+
+        Queryable queryable = new Queryable().Select().Where().Or().Run();
     }
 }
