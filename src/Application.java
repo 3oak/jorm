@@ -1,3 +1,7 @@
+import java.util.LinkedHashMap;
+
+import jorm.clause.ComparisonOperator;
+import jorm.clause.Expression;
 import jorm.connection.ConnectionFactory;
 import jorm.connection.MySQLConnection;
 import jorm.connection.configuration.MySQLConfiguration;
@@ -38,30 +42,26 @@ public class Application {
         // ** Create query from connection
         // MySQLQuery<Character> query = connection.CreateQuery(Character.class);
 
-        MySQLConnection connection = ConnectionFactory.CreateConnection(MySQLConnection.class);
+        MySQLConnection connection = ConnectionFactory.createConnection(MySQLConnection.class);
 
         MySQLConfiguration _config = new MySQLConfiguration();
         _config
-                .SetUsername("root")
-                .SetPassword("5091Nephilim7031;")
-                .SetHostName("localhost");
+                .setUsername("root")
+                .setPassword("root")
+                .setHostName("localhost");
 
         _config
-                .SetPort("3306")
-                .SetDatabaseName("ouchtion");
+                .setPort("3306")
+                .setDatabaseName("ouchtion");
 
-        System.out.println(_config.GetConnectionURL());
+        System.out.println(_config.getConnectionURL());
 
         try {
             connection.OpenConnection(_config);
         } catch (Exception exception) {
             exception.printStackTrace();
         }
-
-        MySQLQuery<Character> query = connection.CreateQuery(Character.class);
-
-        Character samuel = new Character("Samuel", 100);
-
-        query.Insert(samuel);
+        MySQLQuery<Character> mySQLQuery = connection.CreateQuery(Character.class);
+        mySQLQuery.SelectAll().Where(Expression.simpleBinomialClause("name", ComparisonOperator.Equal, 1)).Execute();
     }
 }

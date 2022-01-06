@@ -5,9 +5,11 @@ import jorm.clause.Clause;
 import java.util.List;
 import java.util.function.Predicate;
 
-@SuppressWarnings({"unused", "UnusedReturnValue"})
+@SuppressWarnings("unused")
 public interface Queryable<T> {
     Queryable<T> SelectAll();
+
+    Queryable<T> Where(String queryString);
 
     Queryable<T> Where(Clause clauses);
 

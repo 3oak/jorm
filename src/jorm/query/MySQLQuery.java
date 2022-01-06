@@ -1,25 +1,21 @@
 package jorm.query;
 
-import jorm.Mapper;
-import jorm.clause.Clause;
-import jorm.executor.Executor;
-
-import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
-@SuppressWarnings("unused")
+import jorm.Mapper;
+import jorm.clause.Clause;
+import jorm.utils.Tuple;
+
 public class MySQLQuery<T> implements Queryable<T> {
     private static Connection connection;
 
     private final Class<T> genericClass;
-
     private final Mapper<T> mapper;
     private final ArrayList<T> dataList;
+    private final QueryCommand command;
 
     public MySQLQuery(Class<T> genericClass, Connection connection)
             throws RuntimeException {
@@ -27,48 +23,58 @@ public class MySQLQuery<T> implements Queryable<T> {
             MySQLQuery.connection = connection;
 
         this.genericClass = genericClass;
-
         this.mapper = new Mapper<>(genericClass);
         this.dataList = new ArrayList<>();
+        this.command = new QueryCommand();
     }
 
     @Override
     public MySQLQuery<T> SelectAll() {
-        ResultSet resultSet = null;
+        command.addCommand(Tuple.createTuple(QueryType.Select, String.format("select * from %s", mapper.getTableName())));
+        return this;
+//        ResultSet resultSet = null;
+//
+//        // TODO: Get ResultSet
+//
+//        try {
+//            if (resultSet == null)
+//                throw new RuntimeException(String.format("%s: Database load fail", genericClass.getName()));
+//            while (resultSet.next()) {
+//                T data = mapper.Map(resultSet);
+//                dataList.add(data);
+//            }
+//        } catch (SQLException
+//                | NoSuchFieldException
+//                | InstantiationException
+//                | IllegalAccessException
+//                | InvocationTargetException
+//                | NoSuchMethodException e) {
+//            e.printStackTrace();
+//        }
+    }
 
-        // TODO: Get ResultSet
+    @Override
+    public Queryable<T> Where(String queryString) {
+        command.addCommand(Tuple.createTuple(QueryType.Where, queryString));
+        return null;
+    }
 
-        try {
-            if (resultSet == null)
-                throw new RuntimeException(String.format("%s: Database load fail", genericClass.getName()));
-            while (resultSet.next()) {
-                T data = mapper.ToDataObject(resultSet);
-                dataList.add(data);
-            }
-        } catch (SQLException
-                | NoSuchFieldException
-                | InstantiationException
-                | IllegalAccessException
-                | InvocationTargetException
-                | NoSuchMethodException e) {
-            e.printStackTrace();
-        }
+    @Override
+    public Queryable<T> Where(Clause clauses) {
+        command.addCommand(Tuple.createTuple(QueryType.Where, String.format("where %s", clauses.toQueryStringClause())));
         return this;
     }
 
     @Override
-    public MySQLQuery<T> Where(Clause clauses) {
-        return null;
+    public Queryable<T> And(Clause clauses) {
+        command.addCommand(Tuple.createTuple(QueryType.Where, String.format("and %s", clauses.toQueryStringClause())));
+        return this;
     }
 
     @Override
-    public MySQLQuery<T> And(Clause clauses) {
-        return null;
-    }
-
-    @Override
-    public MySQLQuery<T> Or(Clause clauses) {
-        return null;
+    public Queryable<T> Or(Clause clauses) {
+        command.addCommand(Tuple.createTuple(QueryType.Where, String.format("or %s", clauses.toQueryStringClause())));
+        return this;
     }
 
     @Override
@@ -77,34 +83,29 @@ public class MySQLQuery<T> implements Queryable<T> {
     }
 
     @Override
-    public MySQLQuery<T> Insert(T dataObject) {
+    public Queryable<T> Insert(T data) {
         // TODO:
-        // - Inject data values into its own table
         // - Consider relationship mapping annotation: 1-1; 1-n, n-1
         // - Add data to corresponding tables with appropriate constraints
-        // -- Insert function that creates Query
-        // -- Query will be used by Executor to execute the query
-
-        var message = mapper.Insert(dataObject);
-        System.out.println(message);
-
-        return this;
-    }
-
-    @Override
-    public MySQLQuery<T> InsertOrUpdate(T data) {
-
 
         return null;
     }
 
     @Override
-    public MySQLQuery<T> Update(T data) {
+    public Queryable<T> InsertOrUpdate(T data) {
+        
         return null;
     }
 
     @Override
-    public MySQLQuery<T> Execute() {
+    public Queryable<T> Update(T data) {
+        // TODO: Update data using mapper to map data to hash map that key : column & value : value
+        return null;
+    }
+
+    @Override
+    public Queryable<T> Execute() {
+        System.out.println(command.executeCommands());
         return this;
     }
 

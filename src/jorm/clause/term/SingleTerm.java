@@ -1,15 +1,12 @@
 package jorm.clause.term;
 
-@SuppressWarnings("unused")
 public class SingleTerm<T> implements Term {
-    private final T genericData;
-
-    public SingleTerm(T genericData) {
+    private T genericData;
+    public SingleTerm(T genericData){
         this.genericData = genericData;
     }
-
     @Override
-    public String ToQueryString() {
+    public String toQueryString() {
         return genericData.toString();
     }
 }

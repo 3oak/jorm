@@ -9,43 +9,43 @@ public class MySQLConfiguration extends  Configuration {
     public String database = "";
     public LinkedHashMap<String, String> properties = new LinkedHashMap<>();
 
-    public MySQLConfiguration SetHostName(String host) {
+    public MySQLConfiguration setHostName(String host) {
         this.host = host;
         return this;
     }
 
-    public MySQLConfiguration SetPort(String port) {
+    public MySQLConfiguration setPort(String port) {
         this.port = port;
         return this;
     }
 
-    public MySQLConfiguration SetDatabaseName(String database) {
+    public MySQLConfiguration setDatabaseName(String database) {
         this.database = database;
         return this;
     }
 
-    public MySQLConfiguration SetProperty(String key, String value) {
+    public MySQLConfiguration setProperty(String key, String value) {
         this.properties.put(key, value);
         return this;
     }
 
-    public MySQLConfiguration SetProperties(LinkedHashMap<String, String> properties) {
+    public MySQLConfiguration setProperties(LinkedHashMap<String, String> properties) {
         this.properties.putAll(properties);
         return this;
     }
 
     @Override
-    public MySQLConfiguration SetUsername(String username) {
-        return (MySQLConfiguration) super.SetUsername(username);
+    public MySQLConfiguration setUsername(String username) {
+        return (MySQLConfiguration) super.setUsername(username);
     }
 
     @Override
-    public MySQLConfiguration SetPassword(String password) {
-        return (MySQLConfiguration) super.SetPassword(password);
+    public MySQLConfiguration setPassword(String password) {
+        return (MySQLConfiguration) super.setPassword(password);
     }
 
     @Override
-    public String GetConnectionURL() {
+    public String getConnectionURL() {
         StringBuilder connectionURL =
                 new StringBuilder(String.format(
                         "jdbc:mysql://%s:%s/%s",

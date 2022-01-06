@@ -1,12 +1,12 @@
 package jorm.clause;
 
-@SuppressWarnings("unused")
-public class Clause {
-    protected String propertyName;
-    protected ComparisonOperator comparisonOperation;
+import java.lang.reflect.Field;
 
-    protected static String ComparisonOperatorToString(ComparisonOperator operator) {
-        switch (operator) {
+public class Clause{
+    protected String propertyName;
+    protected ComparisonOperator comparisonOperator;
+    protected static String comparisonOperatorToString(ComparisonOperator operator){
+        switch (operator){
             case Greater:
                 return ">";
             case GEqual:
@@ -26,8 +26,5 @@ public class Clause {
         }
         return null;
     }
-
-    public String ToQueryStringClause() {
-        return null;
-    }
+    public String toQueryStringClause() { return null; }
 }
