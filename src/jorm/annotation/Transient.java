@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 
 @SuppressWarnings("unused")
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface Table {
-    String name() default "";
+@Target(ElementType.FIELD)
+public @interface Transient {
+
 }

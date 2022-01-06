@@ -3,49 +3,49 @@ package jorm.connection.configuration;
 import java.util.LinkedHashMap;
 
 @SuppressWarnings({"unused", "UnusedReturnValue"})
-public class MySQLConfiguration extends  Configuration {
+public class MySQLConfiguration extends Configuration {
     public String host = "localhost";
     public String port = "3306";
     public String database = "";
     public LinkedHashMap<String, String> properties = new LinkedHashMap<>();
 
-    public MySQLConfiguration setHostName(String host) {
+    public MySQLConfiguration SetHostName(String host) {
         this.host = host;
         return this;
     }
 
-    public MySQLConfiguration setPort(String port) {
+    public MySQLConfiguration SetPort(String port) {
         this.port = port;
         return this;
     }
 
-    public MySQLConfiguration setDatabaseName(String database) {
+    public MySQLConfiguration SetDatabaseName(String database) {
         this.database = database;
         return this;
     }
 
-    public MySQLConfiguration setProperty(String key, String value) {
+    public MySQLConfiguration SetProperty(String key, String value) {
         this.properties.put(key, value);
         return this;
     }
 
-    public MySQLConfiguration setProperties(LinkedHashMap<String, String> properties) {
+    public MySQLConfiguration SetProperties(LinkedHashMap<String, String> properties) {
         this.properties.putAll(properties);
         return this;
     }
 
     @Override
-    public MySQLConfiguration setUsername(String username) {
-        return (MySQLConfiguration) super.setUsername(username);
+    public MySQLConfiguration SetUsername(String username) {
+        return (MySQLConfiguration) super.SetUsername(username);
     }
 
     @Override
-    public MySQLConfiguration setPassword(String password) {
-        return (MySQLConfiguration) super.setPassword(password);
+    public MySQLConfiguration SetPassword(String password) {
+        return (MySQLConfiguration) super.SetPassword(password);
     }
 
     @Override
-    public String getConnectionURL() {
+    public String GetConnectionURL() {
         StringBuilder connectionURL =
                 new StringBuilder(String.format(
                         "jdbc:mysql://%s:%s/%s",

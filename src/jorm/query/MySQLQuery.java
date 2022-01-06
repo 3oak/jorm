@@ -12,9 +12,9 @@ import jorm.utils.Tuple;
 public class MySQLQuery<T> implements Queryable<T> {
     private static Connection connection;
 
-    private final Class<T> genericClass;
     private final Mapper<T> mapper;
     private final ArrayList<T> dataList;
+
     private final QueryCommand command;
 
     public MySQLQuery(Class<T> genericClass, Connection connection)
@@ -22,7 +22,6 @@ public class MySQLQuery<T> implements Queryable<T> {
         if (MySQLQuery.connection == null)
             MySQLQuery.connection = connection;
 
-        this.genericClass = genericClass;
         this.mapper = new Mapper<>(genericClass);
         this.dataList = new ArrayList<>();
         this.command = new QueryCommand();
@@ -30,7 +29,13 @@ public class MySQLQuery<T> implements Queryable<T> {
 
     @Override
     public MySQLQuery<T> SelectAll() {
-        command.addCommand(Tuple.createTuple(QueryType.Select, String.format("select * from %s", mapper.getTableName())));
+        command.AddCommand(
+                Tuple.CreateTuple(
+                        QueryType.SELECT,
+                        String.format("select * from %s", mapper.GetTableName())
+                )
+        );
+
         return this;
 //        ResultSet resultSet = null;
 //
@@ -55,25 +60,49 @@ public class MySQLQuery<T> implements Queryable<T> {
 
     @Override
     public Queryable<T> Where(String queryString) {
-        command.addCommand(Tuple.createTuple(QueryType.Where, queryString));
+        command.AddCommand(
+                Tuple.CreateTuple(
+                        QueryType.WHERE,
+                        queryString
+                )
+        );
+
         return null;
     }
 
     @Override
     public Queryable<T> Where(Clause clauses) {
-        command.addCommand(Tuple.createTuple(QueryType.Where, String.format("where %s", clauses.toQueryStringClause())));
+        command.AddCommand(
+                Tuple.CreateTuple(
+                        QueryType.WHERE,
+                        String.format("where %s", clauses.ToQueryStringClause())
+                )
+        );
+
         return this;
     }
 
     @Override
     public Queryable<T> And(Clause clauses) {
-        command.addCommand(Tuple.createTuple(QueryType.Where, String.format("and %s", clauses.toQueryStringClause())));
+        command.AddCommand(
+                Tuple.CreateTuple(
+                        QueryType.WHERE,
+                        String.format("and %s", clauses.ToQueryStringClause())
+                )
+        );
+
         return this;
     }
 
     @Override
     public Queryable<T> Or(Clause clauses) {
-        command.addCommand(Tuple.createTuple(QueryType.Where, String.format("or %s", clauses.toQueryStringClause())));
+        command.AddCommand(
+                Tuple.CreateTuple(
+                        QueryType.WHERE,
+                        String.format("or %s", clauses.ToQueryStringClause())
+                )
+        );
+
         return this;
     }
 
@@ -88,7 +117,6 @@ public class MySQLQuery<T> implements Queryable<T> {
         // TODO:
         // - Consider relationship mapping annotation: 1-1; 1-n, n-1
         // - Add data to corresponding tables with appropriate constraints
-
         mapper.Insert(dataObject);
 
         return this;
@@ -96,19 +124,20 @@ public class MySQLQuery<T> implements Queryable<T> {
 
     @Override
     public Queryable<T> InsertOrUpdate(T data) {
-        
         return null;
     }
 
     @Override
     public Queryable<T> Update(T data) {
         // TODO: Update data using mapper to map data to hash map that key : column & value : value
+
         return null;
     }
 
     @Override
     public Queryable<T> Execute() {
-        System.out.println(command.executeCommands());
+        System.out.println(command.ExecuteCommands());
+
         return this;
     }
 

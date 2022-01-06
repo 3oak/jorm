@@ -48,15 +48,15 @@ public class Application {
 
         MySQLConfiguration _config = new MySQLConfiguration();
         _config
-                .setUsername("root")
-                .setPassword("root")
-                .setHostName("localhost");
+                .SetUsername("root")
+                .SetPassword("root")
+                .SetHostName("localhost");
 
         _config
-                .setPort("3306")
-                .setDatabaseName("ouchtion");
+                .SetPort("3306")
+                .SetDatabaseName("ouchtion");
 
-        System.out.println(_config.getConnectionURL());
+        System.out.println(_config.GetConnectionURL());
 
         try {
             connection.OpenConnection(_config);

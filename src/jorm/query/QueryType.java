@@ -1,8 +1,9 @@
 package jorm.query;
 
+@SuppressWarnings("unused")
 public enum QueryType {
-    Select,
-    Where,
-    Insert,
-    Update
+    SELECT,
+    WHERE,
+    INSERT,
+    UPDATE
 }

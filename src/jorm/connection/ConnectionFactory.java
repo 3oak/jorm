@@ -1,7 +1,6 @@
 package jorm.connection;
 
 import java.lang.reflect.InvocationTargetException;
-import java.sql.Connection;
 
 @SuppressWarnings("unused")
 public class ConnectionFactory {

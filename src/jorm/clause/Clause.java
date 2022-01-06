@@ -1,30 +1,32 @@
 package jorm.clause;
 
-import java.lang.reflect.Field;
-
-public class Clause{
+public class Clause {
     protected String propertyName;
     protected ComparisonOperator comparisonOperator;
-    protected static String comparisonOperatorToString(ComparisonOperator operator){
-        switch (operator){
-            case Greater:
+
+    protected static String ComparisonOperatorToString(ComparisonOperator operator) {
+        switch (operator) {
+            case GREATER:
                 return ">";
-            case GEqual:
+            case GREATER_EQUAL:
                 return ">=";
-            case Less:
+            case LESS:
                 return "<";
-            case LEqual:
+            case LESS_EQUAL:
                 return "<=";
-            case NotEqual:
+            case NOT_EQUAL:
                 return "!=";
-            case Equal:
+            case EQUAL:
                 return "=";
-            case In:
+            case IN:
                 return "IN";
             default:
                 break;
         }
         return null;
     }
-    public String toQueryStringClause() { return null; }
+
+    public String ToQueryStringClause() {
+        return null;
+    }
 }

@@ -1,11 +1,11 @@
 package jorm.clause;
 
 public enum ComparisonOperator {
-    Less,
-    LEqual,
-    Greater,
-    GEqual,
-    NotEqual,
-    Equal,
-    In
+    LESS,
+    LESS_EQUAL,
+    GREATER,
+    GREATER_EQUAL,
+    NOT_EQUAL,
+    EQUAL,
+    IN
 }

@@ -1,9 +1,10 @@
 package jorm.connection;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 
 import jorm.connection.configuration.Configuration;
-import jorm.connection.configuration.MySQLConfiguration;
 import jorm.query.Queryable;
 
 @SuppressWarnings("unused")

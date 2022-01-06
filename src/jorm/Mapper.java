@@ -9,41 +9,47 @@ import java.util.*;
 import jorm.annotation.Table;
 import jorm.annotation.Column;
 
+@SuppressWarnings("unused")
 public class Mapper<T> {
     private final Class<T> genericClass;
     private final String tableName;
-    private final HashMap<Field, String> fieldColumnMapper;
+    private final HashMap<Field, String> fieldColumnDictionary;
 
-    private Executor executor = null;
     private final LinkedList<String> queries = new LinkedList<>();
 
     public Mapper(Class<T> genericClass)
             throws RuntimeException {
         if (!AnnotationValidationUtils.isTableAnnotationPresent(genericClass)) {
-            throw new RuntimeException(String.format("%s does not have @Table Annotation", genericClass.getName()));
+            throw new RuntimeException(
+                    String.format("%s does not have @Table Annotation", genericClass.getName())
+            );
         }
 
         this.genericClass = genericClass;
-        this.tableName = genericClass.getDeclaredAnnotation(Table.class).tableName().isEmpty() ? genericClass.getName() : genericClass.getDeclaredAnnotation(Table.class).tableName();
-        this.fieldColumnMapper = GenerateFieldColumnMapper();
+
+        Table tableAnnotation = genericClass.getAnnotation(Table.class);
+        this.tableName =
+                tableAnnotation.name().isBlank() ?
+                        genericClass.getName() : tableAnnotation.name();
+        this.fieldColumnDictionary = GetFieldColumnDictionary();
     }
 
-    private HashMap<Field, String> GenerateFieldColumnMapper() {
-        HashMap<Field, String> mapper = new HashMap<>();
+    private HashMap<Field, String> GetFieldColumnDictionary() {
+        HashMap<Field, String> fieldColumnDictionary = new HashMap<>();
 
-        for (Field field : genericClass.getDeclaredFields()) {
-            String columnName = null;
+        for (Field field : this.genericClass.getDeclaredFields()) {
+            String columnName =
+                    !field.isAnnotationPresent(Column.class) ?
+                            null : !field.getAnnotation(Column.class).name().isBlank() ?
+                            field.getAnnotation(Column.class).name() : field.getName();
 
-            if (field.isAnnotationPresent(Column.class))
-                columnName = field.getAnnotation(Column.class).columnName();
-
-            mapper.put(field, columnName == null ? null : columnName.isEmpty() ? field.getName() : columnName);
+            fieldColumnDictionary.put(field, columnName);
         }
 
-        return mapper;
+        return fieldColumnDictionary;
     }
 
-    public T Map(ResultSet resultSet)
+    public T ToDataObject(ResultSet resultSet)
             throws
             InstantiationException,
             IllegalAccessException,
@@ -51,11 +57,10 @@ public class Mapper<T> {
             NoSuchFieldException,
             NoSuchMethodException,
             InvocationTargetException {
-        T data = genericClass.getDeclaredConstructor().newInstance();
+        T data = this.genericClass.getDeclaredConstructor().newInstance();
 
-        for (Map.Entry<Field, String> item : fieldColumnMapper.entrySet()) {
-            if (item.getValue() == null)
-                continue;
+        for (Map.Entry<Field, String> item : this.fieldColumnDictionary.entrySet()) {
+            if (item.getValue() == null) continue;
 
             Object fieldData = resultSet.getObject(item.getValue());
             Field field = data.getClass().getDeclaredField(item.getKey().getName());
@@ -66,7 +71,7 @@ public class Mapper<T> {
         return data;
     }
 
-    private String InsertSelf(T dataObject)
+    private String InsertIntoDatabase(T dataObject)
             throws IllegalAccessException {
         int from, to;
         String
@@ -78,7 +83,7 @@ public class Mapper<T> {
         StringBuilder queryStringBuilder =
                 new StringBuilder(
                         "INSERT INTO " + keywordTable + " (" + keywordColumn + ") " +
-                        "VALUES (" + keywordValues + ")"
+                                "VALUES (" + keywordValues + ")"
                 );
 
         /* ---------------------------------------------------------------- */
@@ -128,12 +133,12 @@ public class Mapper<T> {
     public void Insert(T dataObject)
             throws IllegalAccessException {
         queries.clear();
-        queries.add(InsertSelf(dataObject));
+        queries.add(InsertIntoDatabase(dataObject));
 
         // TODO: Use Executor here!
     }
-    
-    public String getTableName() {
+
+    public String GetTableName() {
         return tableName;
     }
 }
