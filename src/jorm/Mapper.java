@@ -34,6 +34,12 @@ public class Mapper<T> {
         this.fieldColumnDictionary = GetFieldColumnDictionary();
     }
 
+    public static String getColumnName(Field field) {
+        return !field.isAnnotationPresent(Column.class) ?
+                null : !field.getAnnotation(Column.class).name().isBlank() ?
+                field.getAnnotation(Column.class).name() : field.getName();
+    }
+
     private HashMap<Field, String> GetFieldColumnDictionary() {
         HashMap<Field, String> fieldColumnDictionary = new HashMap<>();
 

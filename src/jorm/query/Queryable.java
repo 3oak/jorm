@@ -1,6 +1,7 @@
 package jorm.query;
 
 import jorm.clause.Clause;
+import jorm.exception.InvalidSchemaException;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -29,7 +30,7 @@ public interface Queryable<T> {
 
     Queryable<T> Update(T data);
 
-    Queryable<T> Execute();
+    Queryable<T> Preload(Class<T> hasRelationshipWith) throws InvalidSchemaException;
 
     Queryable<T> Pick(String[] fields);
 
