@@ -4,24 +4,11 @@ import jorm.connection.configuration.Configuration;
 import jorm.connection.configuration.MySQLConfiguration;
 import jorm.query.MySQLQuery;
 
-import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
 @SuppressWarnings("unused")
 public class MySQLConnection extends Connectable {
-    @Override
-    public void OpenConnection(String connectionURL)
-            throws SQLException {
-        connection = DriverManager.getConnection(connectionURL);
-    }
-
-    @Override
-    public void OpenConnection(String connectionURL, String username, String password)
-            throws SQLException {
-        connection = DriverManager.getConnection(connectionURL, username, password);
-    }
-
     @Override
     public void OpenConnection(Configuration configuration)
             throws SQLException {
@@ -47,9 +34,5 @@ public class MySQLConnection extends Connectable {
     public <T> MySQLQuery<T> CreateQuery(Class<T> userClass)
             throws RuntimeException {
         return new MySQLQuery<>(userClass, connection);
-    }
-
-    public Connection GetConnection() {
-        return connection;
     }
 }
