@@ -5,15 +5,15 @@ public abstract class Configuration {
     public String username = "root";
     public String password = "root";
 
-    public Configuration SetUsername(String username) {
+    public Configuration setUsername(String username) {
         this.username = username;
         return this;
     }
 
-    public Configuration SetPassword(String password) {
+    public Configuration setPassword(String password) {
         this.password = password;
         return this;
     }
 
-    public abstract String GetConnectionURL();
+    public abstract String getConnectionURL();
 }

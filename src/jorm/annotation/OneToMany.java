@@ -1,15 +1,12 @@
 package jorm.annotation;
 
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.ElementType;
+import jorm.Mapper;
 
 import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+import java.lang.annotation.RetentionPolicy;
 
-@SuppressWarnings("unused")
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.FIELD)
 public @interface OneToMany {
-    String name() default "";
-    String mappedBy() default "";
+    public String mappedBy() default "";
+    public String name() default "";
 }

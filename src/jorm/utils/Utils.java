@@ -5,24 +5,23 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-@SuppressWarnings("unused")
 public class Utils {
 
-    public boolean GetAllTables(Connection connection)
-            throws SQLException {
+    public boolean validateTable(Connection connection) throws SQLException {
+
         DatabaseMetaData databaseMetaData = connection.getMetaData();
         String[] types = {"TABLE"};
 
-        ResultSet tables = databaseMetaData.getTables(null, "PUBLIC", null, types);
-        while (tables.next()) {
-            System.out.println(tables.getString("TABLE_NAME"));
+        ResultSet tablesList = databaseMetaData.getTables(null, null, "%", types);
+        while (tablesList.next()) {
+            System.out.println(tablesList.getString("TABLE_NAME"));
         }
 
         return true;
     }
 
-    public boolean GetAllPrimaryKeys(Connection connection)
-            throws SQLException {
+    public boolean getAllPrimaryKeys(Connection connection) throws SQLException {
+
         DatabaseMetaData databaseMetaData = connection.getMetaData();
         String[] types = {"TABLE"};
 
@@ -30,9 +29,9 @@ public class Utils {
         while (tablesList.next()) {
             String tableName = tablesList.getString("TABLE_NAME");
             System.out.println("Table: " + tableName);
-            try (ResultSet primaryKeys = databaseMetaData.getPrimaryKeys(null, null, tableName)) {
-                while (primaryKeys.next()) {
-                    System.out.println("Primary key: " + primaryKeys.getString("COLUMN_NAME"));
+            try (ResultSet primarykeys = databaseMetaData.getPrimaryKeys(null, null, tableName)) {
+                while (primarykeys.next()) {
+                    System.out.println("Primary key: " + primarykeys.getString("COLUMN_NAME"));
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -42,18 +41,18 @@ public class Utils {
         return true;
     }
 
-    public boolean GetAllForeignKeys(Connection connection)
-            throws SQLException {
+    public boolean getAllForeignKeys(Connection connection) throws SQLException {
+
         DatabaseMetaData databaseMetaData = connection.getMetaData();
         String[] types = {"TABLE"};
 
         ResultSet tablesList = databaseMetaData.getTables(null, null, "%", types);
         while (tablesList.next()) {
             String tableName = tablesList.getString("TABLE_NAME");
-            try (ResultSet foreignKeys = databaseMetaData.getExportedKeys(null, null, tableName)) {
-                while (foreignKeys.next()) {
-                    System.out.println("Foreign key of Table: " + foreignKeys.getString("FKTABLE_NAME"));
-                    System.out.println("Foreign key column: " + foreignKeys.getString("FKCOLUMN_NAME"));
+            try (ResultSet foreignkeys = databaseMetaData.getExportedKeys(null, null, tableName)) {
+                while (foreignkeys.next()) {
+                    System.out.println("Foreign key of Table: " + foreignkeys.getString("FKTABLE_NAME"));
+                    System.out.println("Foreign key column: " + foreignkeys.getString("FKCOLUMN_NAME"));
                 }
             } catch (SQLException e) {
                 e.printStackTrace();

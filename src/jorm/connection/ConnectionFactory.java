@@ -1,6 +1,7 @@
 package jorm.connection;
 
 import java.lang.reflect.InvocationTargetException;
+import java.sql.Connection;
 
 @SuppressWarnings("unused")
 public class ConnectionFactory {
@@ -12,7 +13,7 @@ public class ConnectionFactory {
     protected static Connectable connection;
 
     @SuppressWarnings("unchecked")
-    public static <T extends Connectable> T CreateConnection(Class<T> connectionClass) {
+    public static <T extends Connectable> T createConnection(Class<T> connectionClass) {
         if (connection == null) {
             try {
                 connection = connectionClass.getDeclaredConstructor().newInstance();
