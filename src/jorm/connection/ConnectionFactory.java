@@ -12,7 +12,7 @@ public class ConnectionFactory {
     protected static Connectable connection;
 
     @SuppressWarnings("unchecked")
-    public static <T extends Connectable> T createConnection(Class<T> connectionClass) {
+    public static <T extends Connectable> T CreateConnection(Class<T> connectionClass) {
         if (connection == null) {
             try {
                 connection = connectionClass.getDeclaredConstructor().newInstance();
@@ -29,6 +29,7 @@ public class ConnectionFactory {
                     String.format("Connection is already create with type %s", connection.getClass());
             throw new RuntimeException(message);
         }
+        
         return (T) connection;
     }
 }

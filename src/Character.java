@@ -1,5 +1,6 @@
 import jorm.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 
 @Table
@@ -24,6 +25,12 @@ public class Character {
     }
 
     public Character(String name, int level) {
+        this.name = name;
+        this.level = level;
+        this.createdOn = null;
+    }
+
+    public Character(String name, int level, Date createdOn) {
         this.name = name;
         this.level = level;
         this.createdOn = createdOn;

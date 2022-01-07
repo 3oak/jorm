@@ -7,12 +7,7 @@ import jorm.query.QueryType;
 import jorm.query.builder.DeleteBuilder;
 import jorm.query.builder.QueryBuilder;
 import jorm.utils.Tuple;
-
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
+import jorm.utils.Utils;
 
 public class Application {
     public static void main(String[] args)
@@ -50,7 +45,7 @@ public class Application {
         // ** Create query from connection
         // MySQLQuery<Character> query = connection.CreateQuery(Character.class);
 
-        MySQLConnection connection = ConnectionFactory.createConnection(MySQLConnection.class);
+        MySQLConnection connection = ConnectionFactory.CreateConnection(MySQLConnection.class);
 
         MySQLConfiguration _config = new MySQLConfiguration();
         _config
@@ -71,10 +66,6 @@ public class Application {
         }
 
         MySQLQuery<Character> query = connection.CreateQuery(Character.class);
-
-        Character samuel = new Character("Samuel", 100, Utils.ParseDate("2000-05-19"));
-
-        query.Insert(samuel);
 
         // Queryable queryable = new Queryable().Select().Where().Or().Run();
         //Tuple<QueryType, String> tuple1 = Tuple.CreateTuple(QueryType.DELETE, "students");
@@ -103,5 +94,9 @@ public class Application {
         character.skill = skill;
         character.weapon = weapon;
         query.Update(character);
+
+        var samuel = new Character("Samuel", 100, Utils.ParseDate("2000-05-19"));
+
+        query.Insert(samuel);
     }
 }

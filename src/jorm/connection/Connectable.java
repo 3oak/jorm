@@ -10,7 +10,11 @@ import jorm.query.Queryable;
 @SuppressWarnings("unused")
 public abstract class Connectable {
     protected Connection connection;
-    
+
+    public Connection GetConnection() {
+        return connection;
+    }
+
     public void OpenConnection(String connectionURL)
             throws SQLException {
         connection = DriverManager.getConnection(connectionURL);
@@ -21,14 +25,8 @@ public abstract class Connectable {
         connection = DriverManager.getConnection(connectionURL, username, password);
     }
 
-    public abstract void OpenConnection(Configuration configuration) throws SQLException;
-
-    public abstract <T> Queryable<T> CreateQuery(Class<T> userClass)
-            throws RuntimeException;
-
-    public Connection GetConnection() {
-        return connection;
-    }
+    public abstract void OpenConnection(Configuration configuration)
+            throws SQLException;
 
     public void CloseConnection()
             throws SQLException {
@@ -37,4 +35,7 @@ public abstract class Connectable {
 
         connection.close();
     }
+
+    public abstract <T> Queryable<T> CreateQuery(Class<T> userClass)
+            throws RuntimeException;
 }

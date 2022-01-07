@@ -1,8 +1,9 @@
 package jorm.exception;
 
+@SuppressWarnings("unused")
 public class InvalidSchemaException extends Exception {
-    private String annotationName;
-    private String className;
+    private final String annotationName;
+    private final String className;
 
     public InvalidSchemaException(String annotationName, String className) {
         this.annotationName = annotationName;

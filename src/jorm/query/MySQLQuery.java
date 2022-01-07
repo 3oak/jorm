@@ -1,10 +1,5 @@
 package jorm.query;
 
-import java.lang.reflect.Field;
-import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.List;
-
 import jorm.Mapper;
 import jorm.annotation.ForeignKey;
 import jorm.clause.Clause;
@@ -12,6 +7,12 @@ import jorm.exception.InvalidSchemaException;
 import jorm.utils.Triplet;
 import jorm.utils.Tuple;
 
+import java.lang.reflect.Field;
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.List;
+
+@SuppressWarnings("unused")
 public class MySQLQuery<T> implements Queryable<T> {
     private static Connection connection;
 
@@ -28,8 +29,10 @@ public class MySQLQuery<T> implements Queryable<T> {
         if (MySQLQuery.connection == null)
             MySQLQuery.connection = connection;
 
-        this.mapper = new Mapper<>(genericClass, this::OnAddRelationshipQuery);
         this.genericClass = genericClass;
+
+        this.mapper = new Mapper<>(genericClass, this::OnAddRelationshipQuery);
+
         this.commandList = new ArrayList<>();
         this.waitingPreloads = new ArrayList<>();
 
@@ -59,6 +62,7 @@ public class MySQLQuery<T> implements Queryable<T> {
             commandList.add(command);
             queryList.add(command.GetExecuteQuery());
         }
+
         // Run all preload command
         GetAllQueries();
 
@@ -104,6 +108,7 @@ public class MySQLQuery<T> implements Queryable<T> {
                         clauses.ToQueryStringClause()
                 )
         );
+
         return this;
     }
 
@@ -134,17 +139,41 @@ public class MySQLQuery<T> implements Queryable<T> {
     @Override
     public void Insert(T dataObject)
             throws Exception {
-        // TODO:
-        // - Consider relationship mapping annotation: 1-1; 1-n, n-1
-        // - Add data to corresponding tables with appropriate constraints
+        commandList.get(0).AddCommand(
+                Tuple.CreateTuple(
+                        QueryType.INSERT,
+                        mapper.GetTableName()
+                )
+        );
+
+        var pairColumnValue = mapper.GetPairColumnValue(dataObject);
+        String columns = pairColumnValue.GetHead(),
+                values = pairColumnValue.GetTail();
+
+        commandList.get(0).AddCommand(
+                Tuple.CreateTuple(
+                        QueryType.COLUMN,
+                        columns
+                )
+        );
+
+        commandList.get(0).AddCommand(
+                Tuple.CreateTuple(
+                        QueryType.VALUE,
+                        values
+                )
+        );
+
+        var pairRelationshipInstanceMappers =
+                mapper.GetOneToOneRelationshipInstances(dataObject);
+        for (var pairRelationshipInstanceMapper : pairRelationshipInstanceMappers.entrySet()) {
+            var onetooneMapper = pairRelationshipInstanceMapper.getValue();
 
 
-        var insertQuery = mapper.Insert(dataObject);
+        }
 
-
-        // TODO: Use Executor here!
-
-        return this;
+        // var queryUpdate = mapper.DataObjectToQueryCommand();
+        // commandList.add(queryUpdate);
     }
 
     @Override
@@ -165,7 +194,8 @@ public class MySQLQuery<T> implements Queryable<T> {
 //    }
 
     @Override
-    public void Update(T data) throws IllegalAccessException {
+    public void Update(T data) 
+          throws IllegalAccessException {
         var query = mapper.DataObjectToUpdateQuery(data);
         if(query == null)
             return;
@@ -186,6 +216,7 @@ public class MySQLQuery<T> implements Queryable<T> {
                         picker
                 )
         );
+
         return this;
     }
 
@@ -214,7 +245,7 @@ public class MySQLQuery<T> implements Queryable<T> {
         }
 
         // Get column name
-        String foreignKeyName = Mapper.getColumnName(field);
+        String foreignKeyName = Mapper.GetColumnName(field);
 
         // After the main SELECT, get the <primary key>. Then add a WHERE with clause foreignKeyName = <primaryKey>
         // Preloads will then be a list, do the same to all elements => queries
@@ -243,7 +274,7 @@ public class MySQLQuery<T> implements Queryable<T> {
         System.out.println(command.GetExecuteQuery());
     }
     private void GetAllQueries() {
-        for (var query: queryList) {
+        for (var query : queryList) {
             System.out.println(query);
         }
     }
