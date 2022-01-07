@@ -1,4 +1,4 @@
-package jorm.executor;
+package jorm.query.executor;
 
 import java.sql.Connection;
 import java.sql.ResultSet;

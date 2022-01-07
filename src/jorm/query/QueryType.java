@@ -7,7 +7,7 @@ public enum QueryType {
     UPDATE,
     DELETE,
     WHERE,
-    FIELDS,
+    FIELD,
     AND,
-    OR
+    OR,
 }

@@ -7,9 +7,7 @@ import java.util.List;
 import java.util.function.Predicate;
 
 import jorm.Mapper;
-import jorm.annotation.Column;
 import jorm.annotation.ForeignKey;
-import jorm.annotation.Table;
 import jorm.clause.Clause;
 import jorm.exception.InvalidSchemaException;
 import jorm.utils.Tuple;
@@ -44,7 +42,7 @@ public class MySQLQuery<T> implements Queryable<T> {
         commandList.get(0).AddCommand(
                 Tuple.CreateTuple(
                         QueryType.SELECT,
-                        String.format("%s", mapper.GetTableName()) // QueryCommand will add selected fields. Ex: SELECT <fields> FROM <table name> WHERE ...
+                        mapper.GetTableName() // QueryCommand will add selected fields. Ex: SELECT <fields> FROM <table name> WHERE ...
                         // If no FIELDS is added, then SELECT *
                 )
         );
@@ -72,7 +70,7 @@ public class MySQLQuery<T> implements Queryable<T> {
     }
 
     @Override
-    public Queryable<T> Where(String queryString) {
+    public MySQLQuery<T> Where(String queryString) {
         commandList.get(0).AddCommand(
                 Tuple.CreateTuple(
                         QueryType.WHERE,
@@ -84,11 +82,11 @@ public class MySQLQuery<T> implements Queryable<T> {
     }
 
     @Override
-    public Queryable<T> Where(Clause clauses) {
+    public MySQLQuery<T> Where(Clause clauses) {
         commandList.get(0).AddCommand(
                 Tuple.CreateTuple(
                         QueryType.WHERE,
-                        String.format("where %s", clauses.ToQueryStringClause())
+                        clauses.ToQueryStringClause()
                 )
         );
 
@@ -96,11 +94,11 @@ public class MySQLQuery<T> implements Queryable<T> {
     }
 
     @Override
-    public Queryable<T> And(Clause clauses) {
+    public MySQLQuery<T> And(Clause clauses) {
         commandList.get(0).AddCommand(
                 Tuple.CreateTuple(
                         QueryType.WHERE,
-                        String.format("and %s", clauses.ToQueryStringClause())
+                        clauses.ToQueryStringClause()
                 )
         );
 
@@ -108,11 +106,11 @@ public class MySQLQuery<T> implements Queryable<T> {
     }
 
     @Override
-    public Queryable<T> Or(Clause clauses) {
+    public MySQLQuery<T> Or(Clause clauses) {
         commandList.get(0).AddCommand(
                 Tuple.CreateTuple(
                         QueryType.WHERE,
-                        String.format("or %s", clauses.ToQueryStringClause())
+                        clauses.ToQueryStringClause()
                 )
         );
 
@@ -136,11 +134,11 @@ public class MySQLQuery<T> implements Queryable<T> {
     }
 
     @Override
-    public Queryable<T> Delete(T data) {
+    public MySQLQuery<T> Delete(T data) {
         commandList.get(0).AddCommand(
                 Tuple.CreateTuple(
                         QueryType.DELETE,
-                        String.format("delete from %s", mapper.GetTableName())
+                        mapper.GetTableName()
                 )
         );
 
@@ -148,12 +146,12 @@ public class MySQLQuery<T> implements Queryable<T> {
     }
 
     @Override
-    public Queryable<T> InsertOrUpdate(T data) {
+    public MySQLQuery<T> InsertOrUpdate(T data) {
         return null;
     }
 
     @Override
-    public Queryable<T> Update(T data) {
+    public MySQLQuery<T> Update(T data) {
         // TODO: Update data using mapper to map data to hash map that key : column & value : value
 
         return null;
@@ -197,12 +195,12 @@ public class MySQLQuery<T> implements Queryable<T> {
     }
 
     @Override
-    public Queryable<T> Pick(String[] fields) {
+    public MySQLQuery<T> Pick(String[] fields) {
         String picker = String.join(", ", fields);
         commandList.get(0).AddCommand(
                 Tuple.CreateTuple(
-                        QueryType.FIELDS,
-                        String.format("%s", picker)
+                        QueryType.FIELD,
+                        picker
                 )
         );
         return this;

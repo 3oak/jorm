@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 
 import jorm.clause.ComparisonOperator;
@@ -8,6 +10,9 @@ import jorm.connection.configuration.MySQLConfiguration;
 import jorm.query.MySQLQuery;
 import jorm.query.QueryCommand;
 import jorm.query.QueryType;
+import jorm.query.builder.DeleteBuilder;
+import jorm.query.builder.QueryBuilder;
+import jorm.query.builder.SelectBuilder;
 import jorm.utils.Tuple;
 
 public class Application {
@@ -73,15 +78,17 @@ public class Application {
         query.Insert(samuel);
 
         // Queryable queryable = new Queryable().Select().Where().Or().Run();
-        Tuple<QueryType, String> tuple1 = Tuple.CreateTuple(QueryType.DELETE, "DELETE FROM");
-        Tuple<QueryType, String> tuple2 = Tuple.CreateTuple(QueryType.WHERE, "WHERE");
-        Tuple<QueryType, String> tuple3 = Tuple.CreateTuple(QueryType.AND, "AND");
+        Tuple<QueryType, String> tuple1 = Tuple.CreateTuple(QueryType.DELETE, "students");
+        Tuple<QueryType, String> tuple2 = Tuple.CreateTuple(QueryType.WHERE, "a = b");
+        Tuple<QueryType, String> tuple4 = Tuple.CreateTuple(QueryType.FIELD, "1, 2");
+        Tuple<QueryType, String> tuple3 = Tuple.CreateTuple(QueryType.AND, "c = d");
         QueryCommand queryCommand = new QueryCommand();
         queryCommand.AddCommand(tuple2);
         queryCommand.AddCommand(tuple3);
+        queryCommand.AddCommand(tuple4);
         queryCommand.AddCommand(tuple1);
-        while (!queryCommand.commandQueue.isEmpty()) {
-            System.out.println(queryCommand.commandQueue.poll().GetTail() + " ");
-        }
+
+        QueryBuilder builder = new DeleteBuilder();
+        System.out.print(builder.Build(queryCommand.GetCommandQueue()));
     }
 }
