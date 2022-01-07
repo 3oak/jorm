@@ -9,6 +9,7 @@ import jorm.Mapper;
 import jorm.annotation.ForeignKey;
 import jorm.clause.Clause;
 import jorm.exception.InvalidSchemaException;
+import jorm.utils.Triplet;
 import jorm.utils.Tuple;
 
 public class MySQLQuery<T> implements Queryable<T> {
@@ -153,15 +154,22 @@ public class MySQLQuery<T> implements Queryable<T> {
     }
 
     @Override
-    public void Update(T data) throws IllegalAccessException {
-        QueryCommand queryCommand = mapper.DataObjectToQueryCommand(data);
-        if (queryCommand == null)
-            return;
-        //  TODO: Add to query command list
-        // TODO: Update data using mapper to map data to hash map that key : column & value : value
+    public MySQLQuery<T> InsertOrUpdate(T data) {
+        return null;
+    }
 
-        //command.AddCommand(Tuple.CreateTuple(QueryType.UPDATE, updateQuery));
-        System.out.println(queryCommand.GetExecuteQuery());
+    @Override
+    public MySQLQuery<T> Update(T data) throws IllegalAccessException {
+        var query = mapper.DataObjectToUpdateQuery(data);
+        if(query == null)
+            return this;
+        //  TODO: Add to query command list
+        var tableName = query.GetHead();
+        var setQuery = query.GetTail();
+        commandList.get(0).AddCommand(Tuple.CreateTuple(QueryType.UPDATE, tableName));
+        commandList.get(0).AddCommand(Tuple.CreateTuple(QueryType.SET, setQuery));
+        System.out.println(commandList.get(0).ExecuteCommands());
+        return this;
     }
 
     @Override
@@ -215,6 +223,19 @@ public class MySQLQuery<T> implements Queryable<T> {
         System.out.println(queryCommand.GetExecuteQuery());
     }
 
+    private void OnAddRelationshipQuery(Triplet<String, String, String> query){
+        if(query == null)
+            return;
+        //  TODO: Add to query command list
+        var tableName = query.GetHead();
+        var setQuery = query.GetMid();
+        var whereQuery = query.GetTail();
+        QueryCommand command = new QueryCommand();
+        command.AddCommand(Tuple.CreateTuple(QueryType.UPDATE, tableName));
+        command.AddCommand(Tuple.CreateTuple(QueryType.SET, setQuery));
+        command.AddCommand(Tuple.CreateTuple(QueryType.WHERE, whereQuery));
+        commandList.add(command);
+        System.out.println(command.ExecuteCommands());
     private void GetAllQueries() {
         for (var query: queryList) {
             System.out.println(query);

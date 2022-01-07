@@ -1,5 +1,7 @@
 import jorm.annotation.*;
 
+import java.util.List;
+
 @Table
 public class Character {
     @Column
@@ -8,7 +10,7 @@ public class Character {
     @Column
     private int level;
 
-    @OneToOne
+    @OneToMany
     public Skill skill;
 
     @OneToOne
