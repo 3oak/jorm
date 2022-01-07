@@ -13,3 +13,4 @@ public class InsertBuilder implements QueryBuilder{
         return null;
     }
 }
+

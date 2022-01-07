@@ -38,7 +38,7 @@ public class MySQLQuery<T> implements Queryable<T> {
     }
 
     @Override
-    public MySQLQuery<T> SelectAll() {
+    public MySQLQuery<T> Select() {
         commandList.get(0).AddCommand(
                 Tuple.CreateTuple(
                         QueryType.SELECT,
@@ -171,6 +171,43 @@ public class MySQLQuery<T> implements Queryable<T> {
                         picker
                 )
         );
+        return this;
+    }
+
+    @Override
+    public MySQLQuery<T> Preload(Class<T> hasRelationshipWith) throws InvalidSchemaException {
+        QueryCommand command = new QueryCommand();
+
+        // Setup SELECT * (without FIELDS)
+        command.AddCommand(Tuple.CreateTuple(
+                QueryType.SELECT,
+                hasRelationshipWith.getName()
+        ));
+
+        Mapper<T> mapper = new Mapper<>(hasRelationshipWith, null);
+
+        // Get table name (OR set the one on mapper to static)
+        String tableName = mapper.GetTableName();
+
+        // Get field
+        Field field = null;
+        for (Field f : this.genericClass.getDeclaredFields()) {
+            if (f.isAnnotationPresent(ForeignKey.class) && f.getAnnotation(ForeignKey.class).tableName().equals(tableName)) {
+                field = f;
+            }
+        }
+
+        if (field == null) {
+            throw new InvalidSchemaException("ForeignKey", hasRelationshipWith.getName());
+        }
+
+        // Get column name
+        String foreignKeyName = Mapper.getColumnName(field);
+
+        // After the main SELECT, get the <primary key>. Then add a WHERE with clause foreignKeyName = <primaryKey>
+        // Preloads will then be a list, do the same to all elements => queries
+        waitingPreloads.add(Tuple.CreateTuple(foreignKeyName, command));
+
         return this;
     }
 
