@@ -12,11 +12,12 @@ import jorm.annotation.*;
 import jorm.query.QueryCommand;
 import jorm.query.QueryType;
 import jorm.utils.AnnotationValidationUtils;
+import jorm.utils.Triplet;
 import jorm.utils.Tuple;
 
 @SuppressWarnings("unused")
 public class Mapper<T> {
-    private final Consumer<QueryCommand> onAddRelationQuery;
+    private final Consumer<Triplet<String, String, String>> onAddRelationQuery;
     private final Class<T> genericClass;
     private final String tableName;
     private final HashMap<Field, String> fieldColumnDictionary;
@@ -25,7 +26,7 @@ public class Mapper<T> {
 
     private final LinkedList<String> queries = new LinkedList<>();
 
-    public Mapper(Class<T> genericClass, Consumer<QueryCommand> onAddRelationQuery)
+    public Mapper(Class<T> genericClass, Consumer<Triplet<String, String, String>> onAddRelationQuery)
             throws RuntimeException {
         if (!AnnotationValidationUtils.IsTableAnnotationPresent(genericClass)) {
             throw new RuntimeException(
@@ -127,7 +128,23 @@ public class Mapper<T> {
         return data;
     }
 
-    public <T> QueryCommand DataObjectToQueryCommand(T dataObject) throws IllegalAccessException {
+//    public <T> HashMap<String, String> DataObjectToColumnValue(T dataObject, boolean defaultValueInclude) throws IllegalAccessException{
+//        if(dataObject == null)
+//            throw new NullPointerException();
+//        HashMap<String, String> columnValueDictionary = new HashMap<>();
+//        for (Map.Entry<Field, String> item : fieldColumnDictionary.entrySet()) {
+//            if (item.getValue() == null)
+//                continue;
+//            var valueOfField = GetDataObjectOfField(item.getKey(), dataObject);
+//            if(valueOfField == null)
+//                continue;
+//            var column = item.getValue();
+//            columnValueDictionary.put(item.getValue(), valueOfField.toString());
+//        }
+//        return columnValueDictionary;
+//    }
+
+    public <T> Tuple<String, String> DataObjectToUpdateQuery(T dataObject) throws IllegalAccessException {
         if(dataObject == null)
             throw new NullPointerException();
         StringBuilder setValueQuery = new StringBuilder();
@@ -147,36 +164,42 @@ public class Mapper<T> {
             if(valueOfField == null)
                 continue;
             var relationshipMapper = item.getValue();
-            var relationshipQueryCommand = relationshipMapper.DataObjectToQueryCommand(valueOfField);
+            var relationshipUpdateQuery = relationshipMapper.DataObjectToUpdateQuery(valueOfField);
             var relationshipConditionQuery =
                     String.format("where %s = %s",
                     relationshipMapper.GetColumnNameForeignKeyOfType(genericClass),
                     GetValuePrimaryKey(dataObject));
-            if(relationshipQueryCommand == null)
+            if(relationshipUpdateQuery == null)
                 continue;
-            relationshipQueryCommand.AddCommand(Tuple.CreateTuple(QueryType.WHERE, relationshipConditionQuery));
-            RaiseEventAddRelationshipQuery(relationshipQueryCommand);
+            RaiseEventAddRelationshipQuery(
+                    Triplet.CreateTriplet(
+                            relationshipUpdateQuery.GetHead(),
+                            relationshipUpdateQuery.GetTail(),
+                            relationshipConditionQuery));
         }
         for (Map.Entry<Field, Mapper<?>> item : fieldOneToManyDictionary.entrySet()) {
             var valueOfField = GetDataObjectOfField(item.getKey(), dataObject);
             if(valueOfField == null)
                 continue;
             var relationshipMapper = item.getValue();
-            var relationshipQueryCommand = relationshipMapper.DataObjectToQueryCommand(valueOfField);
+            var relationshipUpdateQuery = relationshipMapper.DataObjectToUpdateQuery(valueOfField);
             var relationshipConditionQuery =
                     String.format("where %s = %s",
                     relationshipMapper.GetColumnNameForeignKeyOfType(genericClass),
                     GetValuePrimaryKey(dataObject));
-            if(relationshipQueryCommand == null)
+            if(relationshipUpdateQuery == null)
                 continue;
-            relationshipQueryCommand.AddCommand(Tuple.CreateTuple(QueryType.WHERE, relationshipConditionQuery));
-            RaiseEventAddRelationshipQuery(relationshipQueryCommand);
+            RaiseEventAddRelationshipQuery(
+                    Triplet.CreateTriplet(
+                            relationshipUpdateQuery.GetHead(),
+                            relationshipUpdateQuery.GetTail(),
+                            relationshipConditionQuery));
         }
         if(setValueQuery.toString().isBlank())
             return  null;
         QueryCommand queryCommand = new QueryCommand();
         queryCommand.AddCommand(Tuple.CreateTuple(QueryType.UPDATE, String.format("Update %s set %s", tableName, setValueQuery)));
-        return queryCommand;
+        return setValueQuery.toString().isBlank() ? null : Tuple.CreateTuple(tableName, setValueQuery.toString());
     }
 
     private String InsertIntoDatabase(T dataObject)
@@ -302,9 +325,9 @@ public class Mapper<T> {
         field.set(dataObject, Value);
     }
 
-    private void RaiseEventAddRelationshipQuery(QueryCommand queryCommand){
+    private void RaiseEventAddRelationshipQuery(Triplet<String, String, String> updateQuery){
         if(onAddRelationQuery != null)
-            onAddRelationQuery.accept(queryCommand);
+            onAddRelationQuery.accept(updateQuery);
     }
 
     public String GetTableName() {
