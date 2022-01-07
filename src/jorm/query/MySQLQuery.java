@@ -4,13 +4,11 @@ import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
 
 import jorm.Mapper;
 import jorm.annotation.ForeignKey;
 import jorm.clause.Clause;
 import jorm.exception.InvalidSchemaException;
-import jorm.query.builder.DeleteBuilder;
 import jorm.utils.Tuple;
 
 public class MySQLQuery<T> implements Queryable<T> {
@@ -18,10 +16,11 @@ public class MySQLQuery<T> implements Queryable<T> {
 
     private final Class<T> genericClass;
     private final Mapper<T> mapper;
-    private final ArrayList<T> dataList;
 
     private final List<QueryCommand> commandList;
     private final List<Tuple<String, QueryCommand>> waitingPreloads;
+
+    private final List<String> queryList;
 
     public MySQLQuery(Class<T> genericClass, Connection connection)
             throws RuntimeException {
@@ -30,25 +29,39 @@ public class MySQLQuery<T> implements Queryable<T> {
 
         this.mapper = new Mapper<>(genericClass, this::OnAddRelationshipQuery);
         this.genericClass = genericClass;
-        this.dataList = new ArrayList<>();
         this.commandList = new ArrayList<>();
         this.waitingPreloads = new ArrayList<>();
 
         // Default command
         commandList.add(new QueryCommand());
+
+        this.queryList = new ArrayList<>();
     }
 
     @Override
-    public MySQLQuery<T> Select() {
+    public QueryData<T> Select() {
         commandList.get(0).AddCommand(
                 Tuple.CreateTuple(
                         QueryType.SELECT,
-                        mapper.GetTableName() // QueryCommand will add selected fields. Ex: SELECT <fields> FROM <table name> WHERE ...
-                        // If no FIELDS is added, then SELECT *
+                        mapper.GetTableName()
                 )
         );
 
-        return this;
+        queryList.add(commandList.get(0).GetExecuteQuery());
+
+        // TODO: Execute the main query and get primary key
+        String primaryKey = "";
+
+        for (var preload : waitingPreloads) {
+            QueryCommand command = preload.GetTail();
+            command.AddCommand(Tuple.CreateTuple(QueryType.WHERE, preload.GetHead() + " = " + primaryKey));
+            commandList.add(command);
+            queryList.add(command.GetExecuteQuery());
+        }
+        // Run all preload command
+        GetAllQueries();
+
+        return new QueryData<>(new ArrayList<>());
 //        ResultSet resultSet = null;
 //
 //        // TODO: Get ResultSet
@@ -79,7 +92,7 @@ public class MySQLQuery<T> implements Queryable<T> {
                 )
         );
 
-        return null;
+        return this;
     }
 
     @Override
@@ -118,23 +131,17 @@ public class MySQLQuery<T> implements Queryable<T> {
     }
 
     @Override
-    public MySQLQuery<T> Filter(Predicate<T> predicate) {
-        return this;
-    }
-
-    @Override
-    public MySQLQuery<T> Insert(T dataObject)
+    public void Insert(T dataObject)
             throws IllegalAccessException {
         // TODO:
         // - Consider relationship mapping annotation: 1-1; 1-n, n-1
         // - Add data to corresponding tables with appropriate constraints
         mapper.Insert(dataObject);
 
-        return this;
     }
 
     @Override
-    public MySQLQuery<T> Delete(T data) {
+    public void Delete(T data) {
         commandList.get(0).AddCommand(
                 Tuple.CreateTuple(
                         QueryType.DELETE,
@@ -142,28 +149,19 @@ public class MySQLQuery<T> implements Queryable<T> {
                 )
         );
 
-        commandList.get(0).setQueryBuilder(new DeleteBuilder());
         commandList.get(0).GetExecuteQuery();
-
-        return this;
     }
 
     @Override
-    public MySQLQuery<T> InsertOrUpdate(T data) {
-        return null;
-    }
-
-    @Override
-    public MySQLQuery<T> Update(T data) throws IllegalAccessException {
+    public void Update(T data) throws IllegalAccessException {
         QueryCommand queryCommand = mapper.DataObjectToQueryCommand(data);
-        if(queryCommand == null)
-            return this;
+        if (queryCommand == null)
+            return;
         //  TODO: Add to query command list
         // TODO: Update data using mapper to map data to hash map that key : column & value : value
 
         //command.AddCommand(Tuple.CreateTuple(QueryType.UPDATE, updateQuery));
         System.out.println(queryCommand.GetExecuteQuery());
-        return this;
     }
 
     @Override
@@ -178,8 +176,7 @@ public class MySQLQuery<T> implements Queryable<T> {
         return this;
     }
 
-    @Override
-    public MySQLQuery<T> Preload(Class<T> hasRelationshipWith) throws InvalidSchemaException {
+    public <N> MySQLQuery<T> Preload(Class<N> hasRelationshipWith) throws InvalidSchemaException {
         QueryCommand command = new QueryCommand();
 
         // Setup SELECT * (without FIELDS)
@@ -188,14 +185,12 @@ public class MySQLQuery<T> implements Queryable<T> {
                 hasRelationshipWith.getName()
         ));
 
-        Mapper<T> mapper = new Mapper<>(hasRelationshipWith, null);
-
         // Get table name (OR set the one on mapper to static)
-        String tableName = mapper.GetTableName();
+        String tableName = this.mapper.GetTableName();
 
         // Get field
         Field field = null;
-        for (Field f : this.genericClass.getDeclaredFields()) {
+        for (Field f : hasRelationshipWith.getDeclaredFields()) {
             if (f.isAnnotationPresent(ForeignKey.class) && f.getAnnotation(ForeignKey.class).tableName().equals(tableName)) {
                 field = f;
             }
@@ -215,13 +210,14 @@ public class MySQLQuery<T> implements Queryable<T> {
         return this;
     }
 
-    @Override
-    public List<T> ToList() {
-        return dataList;
-    }
-
-    private void OnAddRelationshipQuery(QueryCommand queryCommand){
+    private void OnAddRelationshipQuery(QueryCommand queryCommand) {
         // TODO: Add to list QueryCommand
         System.out.println(queryCommand.GetExecuteQuery());
+    }
+
+    private void GetAllQueries() {
+        for (var query: queryList) {
+            System.out.println(query);
+        }
     }
 }

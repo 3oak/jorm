@@ -8,4 +8,13 @@ public class InvalidSchemaException extends Exception {
         this.annotationName = annotationName;
         this.className = className;
     }
+
+
+    @Override
+    public String toString() {
+        return "InvalidSchemaException{" +
+                "annotationName='" + annotationName + '\'' +
+                ", className='" + className + '\'' +
+                '}';
+    }
 }
