@@ -9,6 +9,9 @@ public class Character {
     private String name;
     @Column
     private int level;
+    @Column
+    @Temporal(value = TemporalType.DATE)
+    private Date createdOn;
 
     @OneToMany
     public Skill skill;
@@ -23,6 +26,7 @@ public class Character {
     public Character(String name, int level) {
         this.name = name;
         this.level = level;
+        this.createdOn = createdOn;
     }
 
     public String getName() {
@@ -31,5 +35,9 @@ public class Character {
 
     public int getLevel() {
         return level;
+    }
+
+    public Date getCreatedOn() {
+        return createdOn;
     }
 }

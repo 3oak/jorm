@@ -133,12 +133,18 @@ public class MySQLQuery<T> implements Queryable<T> {
 
     @Override
     public void Insert(T dataObject)
-            throws IllegalAccessException {
+            throws Exception {
         // TODO:
         // - Consider relationship mapping annotation: 1-1; 1-n, n-1
         // - Add data to corresponding tables with appropriate constraints
-        mapper.Insert(dataObject);
 
+
+        var insertQuery = mapper.Insert(dataObject);
+
+
+        // TODO: Use Executor here!
+
+        return this;
     }
 
     @Override

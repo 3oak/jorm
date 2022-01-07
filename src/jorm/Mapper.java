@@ -247,12 +247,52 @@ public class Mapper<T> {
             field.setAccessible(true);
 
             columnStringBuilder.append(column);
-            valueStringBuilder.append(field.get(dataObject).toString());
+
+            Class<?> fieldType = field.getType();
+
+            var temporal =
+                    !field.isAnnotationPresent(Temporal.class) ?
+                            null : field.getAnnotation(Temporal.class).value();
+
+            if (fieldType.isAssignableFrom(java.util.Date.class) && temporal == null) {
+                throw new RuntimeException("Field has not been assigned annotation @Temporal");
+            } else if (!fieldType.isAssignableFrom(java.util.Date.class) && temporal != null) {
+                throw new RuntimeException("Annotation @Temporal could only be assigned to java.util.Date class");
+            } else if (fieldType.isAssignableFrom(java.util.Date.class) && temporal != null) {
+                switch (temporal) {
+                    case DATE:
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                        valueStringBuilder
+                                .append("'")
+                                .append(dateFormat.format(((java.util.Date) field.get(dataObject))))
+                                .append("'");
+                        break;
+                    case TIME:
+                        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+                        valueStringBuilder
+                                .append("'")
+                                .append(timeFormat.format(((java.util.Date) field.get(dataObject))))
+                                .append("'");
+                        break;
+                    case TIMESTAMP:
+                        SimpleDateFormat datetimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        valueStringBuilder
+                                .append("'")
+                                .append(datetimeFormat.format(((java.util.Date) field.get(dataObject))))
+                                .append("'");
+                        break;
+                    default:
+                        break;
+                }
+            } else {
+                valueStringBuilder
+                        .append("'")
+                        .append(field.get(dataObject).toString())
+                        .append("'");
+            }
 
             index++;
         }
-
-        // TODO: Datetime process here!
 
         from = queryStringBuilder.indexOf(keywordColumn);
         to = from + keywordColumn.length();
