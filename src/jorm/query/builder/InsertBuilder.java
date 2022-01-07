@@ -10,7 +10,33 @@ import java.util.PriorityQueue;
 public class InsertBuilder implements QueryBuilder{
     @Override
     public String Build(PriorityQueue<Tuple<QueryType, String>> commandQueue) {
-        return null;
+        StringBuilder stringBuilder = new StringBuilder();
+        boolean isColumnExisted = false;
+        boolean isValueExisted = false;
+
+        while (!commandQueue.isEmpty()) {
+            Tuple<QueryType, String> command = commandQueue.poll();
+            QueryType type = command.GetHead();
+            switch (type) {
+                case INSERT:
+                    stringBuilder.append(type).append(" ").append("INTO").append(" ").append(command.GetTail());
+                    break;
+                case COLUMN:
+                    if (!isColumnExisted) {
+                        stringBuilder.append(" ").append("(").append(command.GetTail()).append(")");
+                        isColumnExisted = true;
+                    }
+                    break;
+                case VALUE:
+                    if (!isValueExisted) {
+                        stringBuilder.append(" ").append("(").append(command.GetTail()).append(")");
+                        isValueExisted = true;
+                    }
+                    break;
+            }
+        }
+
+        return stringBuilder.toString();
     }
 }
 
