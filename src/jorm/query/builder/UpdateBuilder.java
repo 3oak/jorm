@@ -24,7 +24,7 @@ public class UpdateBuilder implements QueryBuilder {
                     break;
                 case SET:
                     if (!isSetExisted) {
-                        stringBuilder.append(type).append(" ").append(command.GetTail());
+                        stringBuilder.append(" ").append(type).append(" ").append(command.GetTail());
                         isSetExisted = true;
                     }
                     break;
