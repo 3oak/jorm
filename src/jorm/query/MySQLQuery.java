@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,6 +50,10 @@ public class MySQLQuery<T> implements Queryable<T> {
 
     @Override
     public QueryData<T> Select() throws SQLException, NoSuchFieldException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException, InvalidSchemaException {
+//        for (Triplet<Class<?>, String, QueryCommand> test : waitingPreloads) {
+//            System.out.println(test.GetMid());
+//        }
+
         commandList.get(0).AddCommand(
                 Tuple.CreateTuple(
                         QueryType.SELECT,
@@ -56,13 +61,17 @@ public class MySQLQuery<T> implements Queryable<T> {
                 )
         );
 
-        ResultSet resultSet = executor.ExecuteQuery(commandList.get(0).GetExecuteQuery());
-
         ArrayList<T> data = new ArrayList<>();
 
-        while (resultSet.next()) {
-            T object = mapper.ToDataObject(resultSet);
-            data.add(object);
+        try (Statement statement = connection.createStatement()) {
+            // Auto resource management
+            ResultSet resultSet = statement.executeQuery(commandList.get(0).GetExecuteQuery());
+            while (resultSet.next()) {
+                T object = mapper.ToDataObject(resultSet);
+                data.add(object);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
 
         // Get primary key
@@ -74,23 +83,31 @@ public class MySQLQuery<T> implements Queryable<T> {
 
             for (var preload : waitingPreloads) {
                 QueryCommand command = preload.GetTail();
-                command.AddCommand(Tuple.CreateTuple(QueryType.WHERE, preload.GetMid() + " = " + primaryKeyValue));
-
-                ResultSet rs = executor.ExecuteQuery(command.GetExecuteQuery());
+                command.AddCommand(Tuple.CreateTuple(QueryType.WHERE, preload.GetMid() + " = " + "'" + primaryKeyValue + "'"));
 
                 ArrayList<T> dt = new ArrayList<>();
 
-                while (rs.next()) {
-                    T object = mapper.ToDataObject(resultSet);
-                    dt.add(object);
+                try (Statement statement = connection.createStatement()) {
+                    // Auto resource management
+                    ResultSet rs = statement.executeQuery(command.GetExecuteQuery());
+                    while (rs.next()) {
+//                        Mapper<?> sub_mapper = new Mapper<>(preload.GetHead(), null);
+                        T object = mapper.ToDataObject(rs);
+                        dt.add(object);
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    return null;
                 }
-
+//
                 Tuple<Field, String> f = this.mapper.GetFieldWithRelationship(preload.GetHead());
                 if (f.GetTail().equals(OneToOne.class.toString())) {
                     f.GetHead().set(d, dt.get(0));
                 } else if (f.GetTail().equals(OneToMany.class.toString())) {
                     f.GetHead().set(d, dt);
                 }
+
+//                System.out.println(preload.GetTail());
             }
         }
 
@@ -243,9 +260,10 @@ public class MySQLQuery<T> implements Queryable<T> {
         QueryCommand command = new QueryCommand();
 
         // Setup SELECT * (without FIELDS)
+        Mapper<N> mapper = new Mapper<>(hasRelationshipWith, null);
         command.AddCommand(Tuple.CreateTuple(
                 QueryType.SELECT,
-                hasRelationshipWith.getName()
+                mapper.GetTableName()
         ));
 
         // Get field
