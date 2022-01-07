@@ -98,5 +98,11 @@ public class Application {
 
         QueryBuilder builder = new DeleteBuilder();
         System.out.print(builder.Build(queryCommand.GetCommandQueue()));
+        var character = new Character("HPQ", 10);
+        var skill = new Skill("skillId1", 5, "PQ");
+        var weapon = new Weapon();
+        character.skill = skill;
+        character.weapon = weapon;
+        query.Update(character);
     }
 }

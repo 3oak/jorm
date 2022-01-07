@@ -1,12 +1,18 @@
-import jorm.annotation.Table;
-import jorm.annotation.Column;
+import jorm.annotation.*;
 
 @Table
 public class Character {
     @Column
+    @PrimaryKey
     private String name;
     @Column
     private int level;
+
+    @OneToOne
+    public Skill skill;
+
+    @OneToOne
+    public Weapon weapon;
 
     public Character() {
 

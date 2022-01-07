@@ -8,7 +8,7 @@ import java.util.function.Predicate;
 
 @SuppressWarnings("unused")
 public interface Queryable<T> {
-    Queryable<T> SelectAll();
+    Queryable<T> Select();
 
     Queryable<T> Where(String queryString);
 
@@ -28,7 +28,7 @@ public interface Queryable<T> {
 
     Queryable<T> InsertOrUpdate(T data);
 
-    Queryable<T> Update(T data);
+    Queryable<T> Update(T data) throws IllegalAccessException;
 
     Queryable<T> Preload(Class<T> hasRelationshipWith) throws InvalidSchemaException;
 
