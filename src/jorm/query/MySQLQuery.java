@@ -27,8 +27,8 @@ public class MySQLQuery<T> implements Queryable<T> {
         if (MySQLQuery.connection == null)
             MySQLQuery.connection = connection;
 
+        this.mapper = new Mapper<>(genericClass, this::OnAddRelationshipQuery);
         this.genericClass = genericClass;
-        this.mapper = new Mapper<>(genericClass);
         this.dataList = new ArrayList<>();
         this.commandList = new ArrayList<>();
         this.waitingPreloads = new ArrayList<>();
@@ -89,7 +89,6 @@ public class MySQLQuery<T> implements Queryable<T> {
                         clauses.ToQueryStringClause()
                 )
         );
-
         return this;
     }
 
@@ -151,46 +150,15 @@ public class MySQLQuery<T> implements Queryable<T> {
     }
 
     @Override
-    public MySQLQuery<T> Update(T data) {
+    public MySQLQuery<T> Update(T data) throws IllegalAccessException {
+        QueryCommand queryCommand = mapper.DataObjectToQueryCommand(data);
+        if(queryCommand == null)
+            return this;
+        //  TODO: Add to query command list
         // TODO: Update data using mapper to map data to hash map that key : column & value : value
 
-        return null;
-    }
-
-    @Override
-    public MySQLQuery<T> Preload(Class<T> hasRelationshipWith) throws InvalidSchemaException {
-        QueryCommand command = new QueryCommand();
-
-        // Setup SELECT * (without FIELDS)
-        command.AddCommand(Tuple.CreateTuple(
-                QueryType.SELECT,
-                hasRelationshipWith.getName()
-        ));
-
-        Mapper<T> mapper = new Mapper<>(hasRelationshipWith);
-
-        // Get table name (OR set the one on mapper to static)
-        String tableName = mapper.GetTableName();
-
-        // Get field
-        Field field = null;
-        for (Field f : this.genericClass.getDeclaredFields()) {
-            if (f.isAnnotationPresent(ForeignKey.class) && f.getAnnotation(ForeignKey.class).tableName().equals(tableName)) {
-                field = f;
-            }
-        }
-
-        if (field == null) {
-            throw new InvalidSchemaException("ForeignKey", hasRelationshipWith.getName());
-        }
-
-        // Get column name
-        String foreignKeyName = Mapper.getColumnName(field);
-
-        // After the main SELECT, get the <primary key>. Then add a WHERE with clause foreignKeyName = <primaryKey>
-        // Preloads will then be a list, do the same to all elements => queries
-        waitingPreloads.add(Tuple.CreateTuple(foreignKeyName, command));
-
+        //command.AddCommand(Tuple.CreateTuple(QueryType.UPDATE, updateQuery));
+        System.out.println(queryCommand.ExecuteCommands());
         return this;
     }
 
@@ -209,5 +177,10 @@ public class MySQLQuery<T> implements Queryable<T> {
     @Override
     public List<T> ToList() {
         return dataList;
+    }
+
+    private void OnAddRelationshipQuery(QueryCommand queryCommand){
+        // TODO: Add to list QueryCommand
+        System.out.println(queryCommand.ExecuteCommands());
     }
 }
