@@ -20,7 +20,7 @@ public class QueryCommand {
         StringBuilder stringBuilder = new StringBuilder();
 
         for (var item : commandQueue) {
-            stringBuilder.append(item.item2).append(" ");
+            stringBuilder.append(item.GetTail()).append(" ");
         }
 
         return stringBuilder.toString();
@@ -35,55 +35,30 @@ class TupleComparator implements Comparator<Tuple<QueryType, String>> {
 
     @Override
     public int compare(Tuple<QueryType, String> o1, Tuple<QueryType, String> o2) {
-        QueryLevel queryLevel1 = null, queryLevel2 = null;
+        QueryLevel
+                queryLevel1 = GetHeadObject(o1),
+                queryLevel2 = GetHeadObject(o2);
 
-        switch (o1.item1) {
-            case SELECT:
-            case UPDATE:
-            case INSERT:
-            case DELETE:
-                queryLevel1 = QueryLevel.COMMANDS;
-                break;
-            case WHERE:
-                queryLevel1 = QueryLevel.WHERE;
-                break;
-            case AND:
-            case OR:
-                queryLevel1 = QueryLevel.CONDITION;
-                break;
-            case FIELDS:
-                queryLevel1 = QueryLevel.FIELD;
-                break;
-        }
-
-        switch (o2.item1) {
-            case SELECT:
-            case UPDATE:
-            case INSERT:
-            case DELETE:
-                queryLevel2 = QueryLevel.COMMANDS;
-                break;
-            case WHERE:
-                queryLevel2 = QueryLevel.WHERE;
-                break;
-            case AND:
-            case OR:
-                queryLevel2 = QueryLevel.CONDITION;
-                break;
-            case FIELDS:
-                queryLevel2 = QueryLevel.FIELD;
-                break;
-        }
-
-        if (queryLevel1.ordinal() < queryLevel2.ordinal()) {
-            return 1;
-        } else if (queryLevel1.ordinal() > queryLevel2.ordinal()) {
-            return -1;
-        } else {
-            return 0;
-        }
+        return Integer.compare(Objects.requireNonNull(queryLevel2).ordinal(), Objects.requireNonNull(queryLevel1).ordinal());
     }
 
+    private QueryLevel GetHeadObject(Tuple<QueryType, String> o) {
+        switch (o.GetHead()) {
+            case SELECT:
+            case UPDATE:
+            case INSERT:
+            case DELETE:
+                return QueryLevel.COMMANDS;
+            case WHERE:
+                return QueryLevel.WHERE;
+            case AND:
+            case OR:
+                return QueryLevel.CONDITION;
+            case FIELDS:
+                return QueryLevel.FIELD;
+        }
+        return null;
+    }
 }
 
 enum QueryLevel {
