@@ -10,6 +10,7 @@ import jorm.Mapper;
 import jorm.annotation.ForeignKey;
 import jorm.clause.Clause;
 import jorm.exception.InvalidSchemaException;
+import jorm.query.builder.DeleteBuilder;
 import jorm.utils.Tuple;
 
 public class MySQLQuery<T> implements Queryable<T> {
@@ -141,6 +142,9 @@ public class MySQLQuery<T> implements Queryable<T> {
                 )
         );
 
+        commandList.get(0).setQueryBuilder(new DeleteBuilder());
+        commandList.get(0).GetExecuteQuery();
+
         return this;
     }
 
@@ -158,7 +162,7 @@ public class MySQLQuery<T> implements Queryable<T> {
         // TODO: Update data using mapper to map data to hash map that key : column & value : value
 
         //command.AddCommand(Tuple.CreateTuple(QueryType.UPDATE, updateQuery));
-        System.out.println(queryCommand.ExecuteCommands());
+        System.out.println(queryCommand.GetExecuteQuery());
         return this;
     }
 
@@ -218,6 +222,6 @@ public class MySQLQuery<T> implements Queryable<T> {
 
     private void OnAddRelationshipQuery(QueryCommand queryCommand){
         // TODO: Add to list QueryCommand
-        System.out.println(queryCommand.ExecuteCommands());
+        System.out.println(queryCommand.GetExecuteQuery());
     }
 }

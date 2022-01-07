@@ -1,5 +1,6 @@
 package jorm.query;
 
+import jorm.query.builder.QueryBuilder;
 import jorm.utils.Tuple;
 import jorm.utils.TupleComparator;
 
@@ -8,9 +9,19 @@ import java.util.*;
 @SuppressWarnings("unused")
 public class QueryCommand {
     private final PriorityQueue<Tuple<QueryType, String>> commandQueue;
+    private QueryBuilder queryBuilder;
 
     public QueryCommand() {
-        commandQueue = new PriorityQueue<>(new TupleComparator());
+        this.commandQueue = new PriorityQueue<>(new TupleComparator());
+    }
+
+    public QueryCommand(QueryBuilder queryBuilder) {
+        this.queryBuilder = queryBuilder;
+        this.commandQueue = new PriorityQueue<>(new TupleComparator());
+    }
+
+    public void setQueryBuilder(QueryBuilder queryBuilder) {
+        this.queryBuilder = queryBuilder;
     }
 
     public void AddCommand(Tuple<QueryType, String> command) {
@@ -21,14 +32,8 @@ public class QueryCommand {
         return commandQueue;
     }
 
-    public String ExecuteCommands() {
-        StringBuilder stringBuilder = new StringBuilder();
-
-        for (var item : commandQueue) {
-            stringBuilder.append(item.GetTail()).append(" ");
-        }
-
-        return stringBuilder.toString();
+    public String GetExecuteQuery() {
+        return queryBuilder.Build(this.commandQueue);
     }
 
     public void Clear() {
