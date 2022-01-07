@@ -4,6 +4,9 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @SuppressWarnings("unused")
 public class Utils {
@@ -64,5 +67,20 @@ public class Utils {
         }
 
         return true;
+    }
+
+    public static Date ParseDate(String date)
+            throws ParseException {
+        return new SimpleDateFormat("yyyy-MM-dd").parse(date);
+    }
+
+    public static Date ParseTime(String time)
+            throws ParseException {
+        return new SimpleDateFormat("HH:mm:ss").parse(time);
+    }
+
+    public static Date ParseDateTime(String datetime)
+            throws ParseException {
+        return new SimpleDateFormat("yyyy-MM-dd HH-mm-ss").parse(datetime);
     }
 }

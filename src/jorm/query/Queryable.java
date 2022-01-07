@@ -3,7 +3,10 @@ package jorm.query;
 import jorm.clause.Clause;
 import jorm.exception.InvalidSchemaException;
 
-@SuppressWarnings("unused")
+import java.util.List;
+import java.util.function.Predicate;
+
+@SuppressWarnings({"unused", "UnusedReturnValue"})
 public interface Queryable<T> {
     // Chaining methods
     Queryable<T> Where(String queryString);

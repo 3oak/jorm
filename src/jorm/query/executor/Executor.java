@@ -14,8 +14,9 @@ public class Executor {
         this.connection = connection;
     }
 
-    public void ExecuteNonQuery(Queue<String> queries)  {
-        try (Statement statement = connection.createStatement()) {  // Auto resource management
+    public void ExecuteNonQuery(Queue<String> queries) {
+        try (Statement statement = connection.createStatement()) {
+            // Auto resource management
             connection.setAutoCommit(false);
             while (!queries.isEmpty()) {
                 statement.executeUpdate(queries.remove());
@@ -33,7 +34,8 @@ public class Executor {
     }
 
     public ResultSet ExecuteQuery(String query) {
-        try (Statement statement = connection.createStatement()) {  // Auto resource management
+        try (Statement statement = connection.createStatement()) {
+            // Auto resource management
             return statement.executeQuery(query);
         } catch (SQLException e) {
             e.printStackTrace();

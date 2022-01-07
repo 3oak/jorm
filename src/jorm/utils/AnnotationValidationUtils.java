@@ -14,11 +14,13 @@ public class AnnotationValidationUtils {
     public static <T> boolean IsTableAnnotationPresent(Class<T> genericClass) {
         return genericClass.isAnnotationPresent(Table.class);
     }
+
     public static <T> boolean IsAnnotationPresent(Class<T> genericClass, Class<? extends Annotation> annotation) {
         return Arrays.stream(genericClass.getDeclaredFields()).anyMatch(item -> item.isAnnotationPresent(annotation));
     }
-    public static boolean IsForeignKeyMatching(Class<?> renterClass, Class<?> holderClass){
-        if(!AnnotationValidationUtils.IsTableAnnotationPresent(renterClass))
+
+    public static boolean IsForeignKeyMatching(Class<?> renterClass, Class<?> holderClass) {
+        if (!AnnotationValidationUtils.IsTableAnnotationPresent(renterClass))
             return false;
         var referenceTableName = renterClass.getDeclaredAnnotation(Table.class).name().isBlank() ? renterClass.getName() : renterClass.getDeclaredAnnotation(Table.class).name();
         for (var item : holderClass.getDeclaredFields()) {
@@ -28,14 +30,16 @@ public class AnnotationValidationUtils {
         }
         return false;
     }
-    public static boolean IsAnnotationPresent(Field field, Class<? extends Annotation> annotation){
+
+    public static boolean IsAnnotationPresent(Field field, Class<? extends Annotation> annotation) {
         return field.isAnnotationPresent(annotation);
     }
-    public static boolean IsAnnotationPresentOnce(Field field, List<Class<? extends Annotation>> annotations){
+
+    public static boolean IsAnnotationPresentOnce(Field field, List<Class<? extends Annotation>> annotations) {
         return annotations.stream().anyMatch(field::isAnnotationPresent);
     }
 
-    public static boolean IsPrimitiveOrString(Class<?> validateClass){
+    public static boolean IsPrimitiveOrString(Class<?> validateClass) {
         return Number.class.isAssignableFrom(validateClass) || validateClass.isPrimitive() || CharSequence.class.isAssignableFrom(validateClass);
     }
 }

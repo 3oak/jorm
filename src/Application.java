@@ -7,10 +7,11 @@ import jorm.query.QueryType;
 import jorm.query.builder.DeleteBuilder;
 import jorm.query.builder.QueryBuilder;
 import jorm.utils.Tuple;
+import jorm.utils.Utils;
 
 public class Application {
     public static void main(String[] args)
-            throws IllegalAccessException {
+            throws Exception {
         // ** Create MySQL Connection
         // MySQLConnection connection = ConnectionFactory.createConnection(MySQLConnection.class);
 
@@ -44,12 +45,12 @@ public class Application {
         // ** Create query from connection
         // MySQLQuery<Character> query = connection.CreateQuery(Character.class);
 
-        MySQLConnection connection = ConnectionFactory.createConnection(MySQLConnection.class);
+        MySQLConnection connection = ConnectionFactory.CreateConnection(MySQLConnection.class);
 
         MySQLConfiguration _config = new MySQLConfiguration();
         _config
                 .SetUsername("root")
-                .SetPassword("root")
+                .SetPassword("5091Nephilim7031;")
                 .SetHostName("localhost");
 
         _config
@@ -65,11 +66,37 @@ public class Application {
         }
 
         MySQLQuery<Character> query = connection.CreateQuery(Character.class);
+
+        // Queryable queryable = new Queryable().Select().Where().Or().Run();
+        //Tuple<QueryType, String> tuple1 = Tuple.CreateTuple(QueryType.DELETE, "students");
+        //Tuple<QueryType, String> tuple2 = Tuple.CreateTuple(QueryType.WHERE, "a = b");
+        //Tuple<QueryType, String> tuple4 = Tuple.CreateTuple(QueryType.FIELD, "1, 2");
+        //Tuple<QueryType, String> tuple3 = Tuple.CreateTuple(QueryType.AND, "c = d");
+        Tuple<QueryType, String> tuple5 = Tuple.CreateTuple(QueryType.INSERT, "INSERT INTO TABLE");
+        Tuple<QueryType, String> tuple6 = Tuple.CreateTuple(QueryType.VALUE, "VALUE");
+        Tuple<QueryType, String> tuple8 = Tuple.CreateTuple(QueryType.COLUMN, "(COLUMN)");
+        Tuple<QueryType, String> tuple7 = Tuple.CreateTuple(QueryType.WHERE, "WHERE");
+        QueryCommand queryCommand = new QueryCommand();
+        queryCommand.AddCommand(tuple5);
+        queryCommand.AddCommand(tuple6);
+        queryCommand.AddCommand(tuple8);
+        queryCommand.AddCommand(tuple7);
+
+        while(!queryCommand.GetCommandQueue().isEmpty()) {
+            System.out.print(queryCommand.GetCommandQueue().poll().GetTail() + " ");
+        }
+
+        QueryBuilder builder = new DeleteBuilder();
+        System.out.print(builder.Build(queryCommand.GetCommandQueue()));
         var character = new Character("HPQ", 10);
         var skill = new Skill("skillId1", 5, "PQ");
         var weapon = new Weapon();
         character.skill = skill;
         character.weapon = weapon;
         query.Update(character);
+
+        var samuel = new Character("Samuel", 100, Utils.ParseDate("2000-05-19"));
+
+        query.Insert(samuel);
     }
 }
