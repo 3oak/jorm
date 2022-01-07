@@ -45,7 +45,11 @@ public class Mapper<T> {
         this.onAddRelationQuery = onAddRelationQuery;
     }
 
-    public static String getColumnName(Field field) {
+    public String GetTableName() {
+        return tableName;
+    }
+
+    public static String GetColumnName(Field field) {
         return !field.isAnnotationPresent(Column.class) ?
                 null : !field.getAnnotation(Column.class).name().isBlank() ?
                 field.getAnnotation(Column.class).name() : field.getName();
@@ -261,12 +265,8 @@ public class Mapper<T> {
         return queryStringBuilder.toString();
     }
 
-    public void Insert(T dataObject)
-            throws IllegalAccessException {
-        queries.clear();
-        queries.add(InsertIntoDatabase(dataObject));
+    public void Insert(T dataObject) {
 
-        // TODO: Use Executor here!
     }
     
 //    public void Delete(T dataObject)
