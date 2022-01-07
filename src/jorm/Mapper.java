@@ -1,8 +1,7 @@
 package jorm;
 
 import java.lang.annotation.AnnotationTypeMismatchException;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -10,6 +9,7 @@ import java.util.*;
 import java.util.function.Consumer;
 
 import jorm.annotation.*;
+import jorm.exception.InvalidSchemaException;
 import jorm.query.QueryCommand;
 import jorm.query.QueryType;
 import jorm.utils.AnnotationValidationUtils;
@@ -52,6 +52,10 @@ public class Mapper<T> {
 
     public String GetTableName() {
         return tableName;
+    }
+
+    public Class<T> GetGenericClass() {
+        return genericClass;
     }
 
     public static String GetColumnName(Field field) {
@@ -233,9 +237,9 @@ public class Mapper<T> {
                     relationshipMapper.DataObjectToUpdateQuery(valueOfField);
             var relationshipConditionQuery =
                     String.format("%s = %s",
-                    relationshipMapper.GetColumnNameForeignKeyOfType(genericClass),
-                    GetValuePrimaryKey(dataObject));
-            if(relationshipUpdateQuery == null)
+                            relationshipMapper.GetColumnNameForeignKeyOfType(genericClass),
+                            GetValuePrimaryKey(dataObject));
+            if (relationshipUpdateQuery == null)
                 continue;
             RaiseEventAddRelationshipQuery(
                     Triplet.CreateTriplet(
@@ -255,9 +259,9 @@ public class Mapper<T> {
                     relationshipMapper.DataObjectToUpdateQuery(valueOfField);
             var relationshipConditionQuery =
                     String.format("%s = %s",
-                    relationshipMapper.GetColumnNameForeignKeyOfType(genericClass),
-                    GetValuePrimaryKey(dataObject));
-            if(relationshipUpdateQuery == null)
+                            relationshipMapper.GetColumnNameForeignKeyOfType(genericClass),
+                            GetValuePrimaryKey(dataObject));
+            if (relationshipUpdateQuery == null)
                 continue;
             RaiseEventAddRelationshipQuery(
                     Triplet.CreateTriplet(
@@ -432,4 +436,60 @@ public class Mapper<T> {
         if (onAddRelationQuery != null)
             onAddRelationQuery.accept(updateQuery);
     }
+
+    public Field GetPrimaryKey() throws InvalidSchemaException {
+        Field field = null;
+        for (Field f : genericClass.getDeclaredFields()) {
+            if (f.isAnnotationPresent(PrimaryKey.class)) {
+                field = f;
+            }
+        }
+        if (field == null) {
+            throw new InvalidSchemaException("PrimaryKey", genericClass.getName());
+        }
+        return field;
+    }
+
+    public <N> Field GetForeignKey(Class<N> hasRelationshipWith) throws InvalidSchemaException {
+        String tableName = GetTableName();
+
+        Field field = null;
+        for (Field f : hasRelationshipWith.getDeclaredFields()) {
+            if (f.isAnnotationPresent(ForeignKey.class) && f.getAnnotation(ForeignKey.class).tableName().equals(tableName)) {
+                field = f;
+            }
+        }
+
+        if (field == null) {
+            throw new InvalidSchemaException("ForeignKey", hasRelationshipWith.getName());
+        }
+
+        return field;
+    }
+
+    public <N> Tuple<Field, String> GetFieldWithRelationship(Class<N> hasRelationshipWith) throws InvalidSchemaException {
+        Field field = null;
+        String relationship = null;
+        for (Field f : genericClass.getDeclaredFields()) {
+            if (f.isAnnotationPresent(OneToOne.class) && f.getType().isAssignableFrom(hasRelationshipWith)) {
+                field = f;
+                relationship = OneToOne.class.getName();
+
+            } else if (f.isAnnotationPresent(OneToMany.class) && List.class.isAssignableFrom(f.getType())) {
+                ParameterizedType genericType = (ParameterizedType) f.getGenericType();
+                Class<?> actualTypeArgument = (Class<?>) genericType.getActualTypeArguments()[0];
+                if (hasRelationshipWith.equals(actualTypeArgument)) {
+                    field = f;
+                    relationship = OneToMany.class.getName();
+                }
+            }
+
+            if (field == null) {
+                throw new InvalidSchemaException("Relationship annotation", hasRelationshipWith.getName());
+            }
+        }
+
+        return Tuple.CreateTuple(field, relationship);
+    }
 }
+

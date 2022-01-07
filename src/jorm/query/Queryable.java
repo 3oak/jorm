@@ -23,7 +23,7 @@ public interface Queryable<T> {
     Queryable<T> Pick(String[] fields);
 
     // Finalizing methods
-    QueryData<T> Select();
+    QueryData<T> Select() throws Exception;
 
     void Insert(T data)
             throws Exception;

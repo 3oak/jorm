@@ -1,35 +1,39 @@
 package jorm.query;
 
-import jorm.Mapper;
-import jorm.annotation.ForeignKey;
-import jorm.clause.Clause;
-import jorm.exception.InvalidSchemaException;
-import jorm.utils.Triplet;
-import jorm.utils.Tuple;
-
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import jorm.Mapper;
+import jorm.annotation.OneToMany;
+import jorm.annotation.OneToOne;
+import jorm.clause.Clause;
+import jorm.exception.InvalidSchemaException;
+import jorm.query.executor.Executor;
+import jorm.utils.Triplet;
+import jorm.utils.Tuple;
 
 @SuppressWarnings("unused")
 public class MySQLQuery<T> implements Queryable<T> {
     private static Connection connection;
 
-    private final Class<T> genericClass;
     private final Mapper<T> mapper;
 
     private final List<QueryCommand> commandList;
-    private final List<Tuple<String, QueryCommand>> waitingPreloads;
+    private final List<Triplet<Class<?>, String, QueryCommand>> waitingPreloads;
 
     private final List<String> queryList;
+
+    private final Executor executor;
 
     public MySQLQuery(Class<T> genericClass, Connection connection)
             throws RuntimeException {
         if (MySQLQuery.connection == null)
             MySQLQuery.connection = connection;
-
-        this.genericClass = genericClass;
 
         this.mapper = new Mapper<>(genericClass, this::OnAddRelationshipQuery);
 
@@ -40,10 +44,11 @@ public class MySQLQuery<T> implements Queryable<T> {
         commandList.add(new QueryCommand());
 
         this.queryList = new ArrayList<>();
+        this.executor = new Executor(connection);
     }
 
     @Override
-    public QueryData<T> Select() {
+    public QueryData<T> Select() throws SQLException, NoSuchFieldException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException, InvalidSchemaException {
         commandList.get(0).AddCommand(
                 Tuple.CreateTuple(
                         QueryType.SELECT,
@@ -51,41 +56,45 @@ public class MySQLQuery<T> implements Queryable<T> {
                 )
         );
 
-        queryList.add(commandList.get(0).GetExecuteQuery());
+        ResultSet resultSet = executor.ExecuteQuery(commandList.get(0).GetExecuteQuery());
 
-        // TODO: Execute the main query and get primary key
-        String primaryKey = "";
+        ArrayList<T> data = new ArrayList<>();
 
-        for (var preload : waitingPreloads) {
-            QueryCommand command = preload.GetTail();
-            command.AddCommand(Tuple.CreateTuple(QueryType.WHERE, preload.GetHead() + " = " + primaryKey));
-            commandList.add(command);
-            queryList.add(command.GetExecuteQuery());
+        while (resultSet.next()) {
+            T object = mapper.ToDataObject(resultSet);
+            data.add(object);
         }
 
-        // Run all preload command
-        GetAllQueries();
+        // Get primary key
+        Field primaryKey = this.mapper.GetPrimaryKey();
+        primaryKey.setAccessible(true);
 
-        return new QueryData<>(new ArrayList<>());
-//        ResultSet resultSet = null;
-//
-//        // TODO: Get ResultSet
-//
-//        try {
-//            if (resultSet == null)
-//                throw new RuntimeException(String.format("%s: Database load fail", genericClass.getName()));
-//            while (resultSet.next()) {
-//                T data = mapper.Map(resultSet);
-//                dataList.add(data);
-//            }
-//        } catch (SQLException
-//                | NoSuchFieldException
-//                | InstantiationException
-//                | IllegalAccessException
-//                | InvocationTargetException
-//                | NoSuchMethodException e) {
-//            e.printStackTrace();
-//        }
+        for (var d : data) {
+            String primaryKeyValue = (String) primaryKey.get(d);
+
+            for (var preload : waitingPreloads) {
+                QueryCommand command = preload.GetTail();
+                command.AddCommand(Tuple.CreateTuple(QueryType.WHERE, preload.GetMid() + " = " + primaryKeyValue));
+
+                ResultSet rs = executor.ExecuteQuery(command.GetExecuteQuery());
+
+                ArrayList<T> dt = new ArrayList<>();
+
+                while (rs.next()) {
+                    T object = mapper.ToDataObject(resultSet);
+                    dt.add(object);
+                }
+
+                Tuple<Field, String> f = this.mapper.GetFieldWithRelationship(preload.GetHead());
+                if (f.GetTail().equals(OneToOne.class.toString())) {
+                    f.GetHead().set(d, dt.get(0));
+                } else if (f.GetTail().equals(OneToMany.class.toString())) {
+                    f.GetHead().set(d, dt);
+                }
+            }
+        }
+
+        return new QueryData<>(data);
     }
 
     @Override
@@ -188,13 +197,8 @@ public class MySQLQuery<T> implements Queryable<T> {
         commandList.get(0).GetExecuteQuery();
     }
 
-//    @Override
-//    public MySQLQuery<T> InsertOrUpdate(T data) {
-//        return null;
-//    }
-
     @Override
-    public void Update(T data) 
+    public void Update(T data)
           throws IllegalAccessException {
         var query = mapper.DataObjectToUpdateQuery(data);
         if(query == null)
@@ -229,35 +233,19 @@ public class MySQLQuery<T> implements Queryable<T> {
                 hasRelationshipWith.getName()
         ));
 
-        // Get table name (OR set the one on mapper to static)
-        String tableName = this.mapper.GetTableName();
-
         // Get field
-        Field field = null;
-        for (Field f : hasRelationshipWith.getDeclaredFields()) {
-            if (f.isAnnotationPresent(ForeignKey.class) && f.getAnnotation(ForeignKey.class).tableName().equals(tableName)) {
-                field = f;
-            }
-        }
-
-        if (field == null) {
-            throw new InvalidSchemaException("ForeignKey", hasRelationshipWith.getName());
-        }
+        Field field = this.mapper.GetForeignKey(hasRelationshipWith);
 
         // Get column name
         String foreignKeyName = Mapper.GetColumnName(field);
 
         // After the main SELECT, get the <primary key>. Then add a WHERE with clause foreignKeyName = <primaryKey>
         // Preloads will then be a list, do the same to all elements => queries
-        waitingPreloads.add(Tuple.CreateTuple(foreignKeyName, command));
+        waitingPreloads.add(Triplet.CreateTriplet(hasRelationshipWith, foreignKeyName, command));
 
         return this;
     }
 
-    private void OnAddRelationshipQuery(QueryCommand queryCommand) {
-        // TODO: Add to list QueryCommand
-        System.out.println(queryCommand.GetExecuteQuery());
-    }
 
     private void OnAddRelationshipQuery(Triplet<String, String, String> query) {
         if (query == null)
@@ -273,6 +261,7 @@ public class MySQLQuery<T> implements Queryable<T> {
         commandList.add(command);
         System.out.println(command.GetExecuteQuery());
     }
+
     private void GetAllQueries() {
         for (var query : queryList) {
             System.out.println(query);
