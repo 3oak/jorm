@@ -176,13 +176,28 @@ public class MySQLQuery<T> implements Queryable<T> {
         var pairRelationshipInstanceMappers =
                 mapper.GetOneToOneRelationshipInstances(dataObject);
         for (var pairRelationshipInstanceMapper : pairRelationshipInstanceMappers.entrySet()) {
+            var instance = pairRelationshipInstanceMapper.getKey();
             var onetooneMapper = pairRelationshipInstanceMapper.getValue();
 
+            var queryTuple = onetooneMapper.DataObjectToUpdateQuery(instance);
+            var queryCommand = new QueryCommand();
+            queryCommand.AddCommand(
+                    Tuple.CreateTuple(
+                            QueryType.UPDATE,
+                            queryTuple.GetHead()
+                    )
+            );
+            queryCommand.AddCommand(
+                    Tuple.CreateTuple(
+                            QueryType.SET,
+                            queryTuple.GetTail()
+                    )
+            );
 
+            commandList.add(queryCommand);
         }
 
-        // var queryUpdate = mapper.DataObjectToQueryCommand();
-        // commandList.add(queryUpdate);
+        // TODO: Add OneToMany Relationship handling feature HERE!!!
     }
 
     @Override

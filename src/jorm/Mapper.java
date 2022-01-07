@@ -148,7 +148,8 @@ public class Mapper<T> {
             // Validate foreign key table name of field matching with this genericClass table name
             if (!AnnotationValidationUtils.IsForeignKeyMatching(genericClass, field.getType()))
                 throw new RuntimeException(
-                        String.format("ForeignKey not matching between two relationship %s and %s",
+                        String.format(
+                                "ForeignKey not matching between two relationship %s and %s",
                                 genericClass.getName(), field.getType().getName()
                         )
                 );
@@ -355,7 +356,7 @@ public class Mapper<T> {
 
     public HashMap<Object, Mapper<?>> GetOneToOneRelationshipInstances(T dataObject)
             throws IllegalAccessException {
-        var relationshipFields = new HashMap<Object, Mapper<?>>();
+        var relationshipInstances = new HashMap<Object, Mapper<?>>();
 
         for (var field : fieldOneToOneDictionary.entrySet()) {
             var relationshipInstance =
@@ -366,10 +367,29 @@ public class Mapper<T> {
 
             var correspondingMapper = field.getValue();
 
-            relationshipFields.put(relationshipInstance, correspondingMapper);
+            relationshipInstances.put(relationshipInstance, correspondingMapper);
         }
 
-        return relationshipFields;
+        return relationshipInstances;
+    }
+
+    public HashMap<Object, Mapper<?>> GetOneToManyRelationshipInstances(T dataObject)
+            throws IllegalAccessException {
+        var relationshipInstances = new HashMap<Object, Mapper<?>>();
+
+        for (var field : fieldOneToManyDictionary.entrySet()) {
+            var relationshipInstance =
+                    GetDataObjectOfField(field.getKey(), dataObject);
+
+            if (relationshipInstance == null)
+                continue;
+
+            var correspondingMapper = field.getValue();
+
+            relationshipInstances.put(relationshipInstance, correspondingMapper);
+        }
+
+        return relationshipInstances;
     }
 
     private <N> String GetValuePrimaryKey(N dataObject)
