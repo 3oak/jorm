@@ -29,6 +29,7 @@ public class TupleComparator implements Comparator<Tuple<QueryType, String>> {
             case OR:
                 return QueryLevel.CONDITION;
             case FIELD:
+            case SET:
                 return QueryLevel.FIELD;
         }
         return null;

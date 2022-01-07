@@ -10,4 +10,5 @@ public enum QueryType {
     FIELD,
     AND,
     OR,
+    SET,
 }
