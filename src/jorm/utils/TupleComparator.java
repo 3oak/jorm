@@ -24,12 +24,14 @@ public class TupleComparator implements Comparator<Tuple<QueryType, String>> {
             case DELETE:
                 return QueryLevel.COMMANDS;
             case WHERE:
+            case VALUE:
                 return QueryLevel.WHERE;
             case AND:
             case OR:
                 return QueryLevel.CONDITION;
             case FIELD:
             case SET:
+            case COLUMN:
                 return QueryLevel.FIELD;
         }
         return null;

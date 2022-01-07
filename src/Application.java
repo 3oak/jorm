@@ -80,15 +80,16 @@ public class Application {
         // Queryable queryable = new Queryable().Select().Where().Or().Run();
         //Tuple<QueryType, String> tuple1 = Tuple.CreateTuple(QueryType.DELETE, "students");
         //Tuple<QueryType, String> tuple2 = Tuple.CreateTuple(QueryType.WHERE, "a = b");
-        Tuple<QueryType, String> tuple4 = Tuple.CreateTuple(QueryType.FIELD, "1, 2");
+        //Tuple<QueryType, String> tuple4 = Tuple.CreateTuple(QueryType.FIELD, "1, 2");
         //Tuple<QueryType, String> tuple3 = Tuple.CreateTuple(QueryType.AND, "c = d");
-        Tuple<QueryType, String> tuple5 = Tuple.CreateTuple(QueryType.UPDATE, "UPDATE TABLE");
-        Tuple<QueryType, String> tuple6 = Tuple.CreateTuple(QueryType.SET, "SET");
+        Tuple<QueryType, String> tuple5 = Tuple.CreateTuple(QueryType.INSERT, "INSERT INTO TABLE");
+        Tuple<QueryType, String> tuple6 = Tuple.CreateTuple(QueryType.VALUE, "VALUE");
+        Tuple<QueryType, String> tuple8 = Tuple.CreateTuple(QueryType.COLUMN, "(COLUMN)");
         Tuple<QueryType, String> tuple7 = Tuple.CreateTuple(QueryType.WHERE, "WHERE");
         QueryCommand queryCommand = new QueryCommand();
         queryCommand.AddCommand(tuple5);
         queryCommand.AddCommand(tuple6);
-        queryCommand.AddCommand(tuple4);
+        queryCommand.AddCommand(tuple8);
         queryCommand.AddCommand(tuple7);
 
         while(!queryCommand.GetCommandQueue().isEmpty()) {
