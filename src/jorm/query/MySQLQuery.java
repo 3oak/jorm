@@ -153,23 +153,22 @@ public class MySQLQuery<T> implements Queryable<T> {
         commandList.get(0).GetExecuteQuery();
     }
 
-    @Override
-    public MySQLQuery<T> InsertOrUpdate(T data) {
-        return null;
-    }
+//    @Override
+//    public MySQLQuery<T> InsertOrUpdate(T data) {
+//        return null;
+//    }
 
     @Override
-    public MySQLQuery<T> Update(T data) throws IllegalAccessException {
+    public void Update(T data) throws IllegalAccessException {
         var query = mapper.DataObjectToUpdateQuery(data);
         if(query == null)
-            return this;
+            return;
         //  TODO: Add to query command list
         var tableName = query.GetHead();
         var setQuery = query.GetTail();
         commandList.get(0).AddCommand(Tuple.CreateTuple(QueryType.UPDATE, tableName));
         commandList.get(0).AddCommand(Tuple.CreateTuple(QueryType.SET, setQuery));
-        System.out.println(commandList.get(0).ExecuteCommands());
-        return this;
+        System.out.println(commandList.get(0).GetExecuteQuery());
     }
 
     @Override
@@ -223,8 +222,8 @@ public class MySQLQuery<T> implements Queryable<T> {
         System.out.println(queryCommand.GetExecuteQuery());
     }
 
-    private void OnAddRelationshipQuery(Triplet<String, String, String> query){
-        if(query == null)
+    private void OnAddRelationshipQuery(Triplet<String, String, String> query) {
+        if (query == null)
             return;
         //  TODO: Add to query command list
         var tableName = query.GetHead();
@@ -235,7 +234,8 @@ public class MySQLQuery<T> implements Queryable<T> {
         command.AddCommand(Tuple.CreateTuple(QueryType.SET, setQuery));
         command.AddCommand(Tuple.CreateTuple(QueryType.WHERE, whereQuery));
         commandList.add(command);
-        System.out.println(command.ExecuteCommands());
+        System.out.println(command.GetExecuteQuery());
+    }
     private void GetAllQueries() {
         for (var query: queryList) {
             System.out.println(query);

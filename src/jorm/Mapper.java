@@ -166,7 +166,7 @@ public class Mapper<T> {
             var relationshipMapper = item.getValue();
             var relationshipUpdateQuery = relationshipMapper.DataObjectToUpdateQuery(valueOfField);
             var relationshipConditionQuery =
-                    String.format("where %s = %s",
+                    String.format("%s = %s",
                     relationshipMapper.GetColumnNameForeignKeyOfType(genericClass),
                     GetValuePrimaryKey(dataObject));
             if(relationshipUpdateQuery == null)
@@ -184,7 +184,7 @@ public class Mapper<T> {
             var relationshipMapper = item.getValue();
             var relationshipUpdateQuery = relationshipMapper.DataObjectToUpdateQuery(valueOfField);
             var relationshipConditionQuery =
-                    String.format("where %s = %s",
+                    String.format("%s = %s",
                     relationshipMapper.GetColumnNameForeignKeyOfType(genericClass),
                     GetValuePrimaryKey(dataObject));
             if(relationshipUpdateQuery == null)
