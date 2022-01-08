@@ -7,7 +7,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import jorm.Mapper;
 import jorm.annotation.OneToMany;
@@ -27,7 +29,7 @@ public class MySQLQuery<T> implements Queryable<T> {
     private final List<QueryCommand> commandList;
     private final List<Triplet<Class<?>, String, QueryCommand>> waitingPreloads;
 
-    private final List<String> queryList;
+    //private final List<String> queryList;
 
     private final Executor executor;
 
@@ -44,7 +46,7 @@ public class MySQLQuery<T> implements Queryable<T> {
         // Default command
         commandList.add(new QueryCommand());
 
-        this.queryList = new ArrayList<>();
+        //this.queryList = new ArrayList<>();
         this.executor = new Executor(connection);
     }
 
@@ -214,6 +216,50 @@ public class MySQLQuery<T> implements Queryable<T> {
         }
 
         // TODO: Add OneToMany Relationship handling feature HERE!!!
+        var pairRelationshipListInstanceMappers =
+                mapper.GetOneToManyRelationshipInstances(dataObject);
+        for (var pairRelationshipListInstanceMapper : pairRelationshipListInstanceMappers.entrySet()){
+            var listInstance = pairRelationshipListInstanceMapper.getKey();
+            var onetoomanyMapper = pairRelationshipListInstanceMapper.getValue();
+            var whereQueryString =
+                            String.format("%s = %s",
+                            onetoomanyMapper.GetColumnNameForeignKeyOfType(mapper.GetGenericClass()),
+                            mapper.GetDataObjectOfField(mapper.GetPrimaryKey(), dataObject));
+            var instanceColumnNamePrimaryKey =onetoomanyMapper.GetColumnNamePrimaryKey();
+            var instanceFieldPrimaryKey = onetoomanyMapper.GetPrimaryKey();
+            for (var instance : listInstance) {
+                var queryTuple = onetoomanyMapper.DataObjectToUpdateQuery(instance);
+                var queryCommand = new QueryCommand();
+                queryCommand.AddCommand(
+                        Tuple.CreateTuple(
+                                QueryType.UPDATE,
+                                queryTuple.GetHead()
+                        )
+                );
+                queryCommand.AddCommand(
+                        Tuple.CreateTuple(
+                                QueryType.SET,
+                                queryTuple.GetTail()
+                        )
+                );
+                queryCommand.AddCommand(
+                        Tuple.CreateTuple(
+                                QueryType.WHERE,
+                                whereQueryString
+                        )
+                );
+                queryCommand.AddCommand(
+                        Tuple.CreateTuple(
+                                QueryType.AND,
+                                String.format("%s = %s",
+                                        instanceColumnNamePrimaryKey,
+                                        onetoomanyMapper.GetDataObjectOfField(instanceFieldPrimaryKey, instance))
+                        )
+                );
+                commandList.add(queryCommand);
+            }
+        }
+        ExecuteCommandQuery();
     }
 
     @Override
@@ -224,8 +270,7 @@ public class MySQLQuery<T> implements Queryable<T> {
                         mapper.GetTableName()
                 )
         );
-
-        commandList.get(0).GetExecuteQuery();
+        ExecuteCommandQuery();
     }
 
     @Override
@@ -239,7 +284,7 @@ public class MySQLQuery<T> implements Queryable<T> {
         var setQuery = query.GetTail();
         commandList.get(0).AddCommand(Tuple.CreateTuple(QueryType.UPDATE, tableName));
         commandList.get(0).AddCommand(Tuple.CreateTuple(QueryType.SET, setQuery));
-        System.out.println(commandList.get(0).GetExecuteQuery());
+        ExecuteCommandQuery();
     }
 
     @Override
@@ -291,12 +336,34 @@ public class MySQLQuery<T> implements Queryable<T> {
         command.AddCommand(Tuple.CreateTuple(QueryType.SET, setQuery));
         command.AddCommand(Tuple.CreateTuple(QueryType.WHERE, whereQuery));
         commandList.add(command);
-        System.out.println(command.GetExecuteQuery());
     }
 
-    private void GetAllQueries() {
-        for (var query : queryList) {
-            System.out.println(query);
+    private void ExecuteCommandQuery(){
+        var queryList = new LinkedList<String>();
+        for (var command : commandList)
+            queryList.add(command.GetExecuteQuery());
+
+        try (Statement statement = connection.createStatement()) {
+            // Auto resource management
+            connection.setAutoCommit(false);
+            while (!queryList.isEmpty()) {
+                statement.executeUpdate(queryList.remove());
+            }
+            connection.commit();
+            connection.setAutoCommit(true);
+        } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+            e.printStackTrace();
+        }
+    }
+
+    public void GetAllCommand() {
+        for (var command : commandList) {
+            System.out.println(command.GetExecuteQuery());
         }
     }
 }

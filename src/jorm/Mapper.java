@@ -257,9 +257,6 @@ public class Mapper<T> {
 
         if (setValueQuery.toString().isBlank())
             return null;
-
-        QueryCommand queryCommand = new QueryCommand();
-        queryCommand.AddCommand(Tuple.CreateTuple(QueryType.UPDATE, String.format("Update %s set %s", tableName, setValueQuery)));
         return setValueQuery.toString().isBlank() ? null : Tuple.CreateTuple(tableName, setValueQuery.toString());
     }
 
@@ -357,20 +354,20 @@ public class Mapper<T> {
         return relationshipInstances;
     }
 
-    public HashMap<Object, Mapper<?>> GetOneToManyRelationshipInstances(T dataObject)
+    public HashMap<List<T>, Mapper<?>> GetOneToManyRelationshipInstances(T dataObject)
             throws IllegalAccessException {
-        var relationshipInstances = new HashMap<Object, Mapper<?>>();
+        var relationshipInstances = new HashMap<List<T>, Mapper<?>>();
 
         for (var field : fieldOneToManyDictionary.entrySet()) {
-            var relationshipInstance =
-                    GetDataObjectOfField(field.getKey(), dataObject);
+            var listRelationshipInstance =
+                    GetDataObjectsOfField(field.getKey(), dataObject);
 
-            if (relationshipInstance == null)
+            if (listRelationshipInstance == null)
                 continue;
 
             var correspondingMapper = field.getValue();
 
-            relationshipInstances.put(relationshipInstance, correspondingMapper);
+            relationshipInstances.put(listRelationshipInstance, correspondingMapper);
         }
 
         return relationshipInstances;
@@ -393,12 +390,12 @@ public class Mapper<T> {
         return null;
     }
 
-    private <N> Object GetDataObjectOfField(Field field, N dataObject)
+    public <N> Object GetDataObjectOfField(Field field, N dataObject)
             throws IllegalAccessException {
         field.setAccessible(true);
         return field.get(dataObject);
     }
-    private <T> List<T> GetDataObjectsOfField(Field field, T dataObject) throws IllegalAccessException {
+    public <T> List<T> GetDataObjectsOfField(Field field, T dataObject) throws IllegalAccessException {
         field.setAccessible(true);
         return (List<T>) field.get(dataObject);
     }
