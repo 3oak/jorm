@@ -10,6 +10,6 @@ public class SingleTerm<T> implements Term {
 
     @Override
     public String ToQueryString() {
-        return genericData.toString();
+        return String.format("'%s'", genericData.toString());
     }
 }
