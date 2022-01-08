@@ -12,6 +12,7 @@ import java.util.*;
 import java.util.function.Consumer;
 
 import jorm.annotation.*;
+import jorm.exception.DefaultConstructorNotFoundException;
 import jorm.exception.InvalidSchemaException;
 import jorm.query.QueryCommand;
 import jorm.query.QueryType;
@@ -166,9 +167,14 @@ public class Mapper<T> {
             IllegalAccessException,
             SQLException,
             NoSuchFieldException,
-            NoSuchMethodException,
-            InvocationTargetException {
-        T data = genericClass.getDeclaredConstructor().newInstance();
+            InvocationTargetException,
+            DefaultConstructorNotFoundException {
+        T data = null;
+        try {
+            data = genericClass.getDeclaredConstructor().newInstance();
+        } catch (NoSuchMethodException e) {
+            throw new DefaultConstructorNotFoundException(genericClass.getName());
+        }
 
         for (Map.Entry<Field, String> item : fieldColumnDictionary.entrySet()) {
             if (item.getValue() == null) continue;

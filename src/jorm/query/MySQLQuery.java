@@ -14,6 +14,7 @@ import jorm.Mapper;
 import jorm.annotation.OneToMany;
 import jorm.annotation.OneToOne;
 import jorm.clause.Clause;
+import jorm.exception.DefaultConstructorNotFoundException;
 import jorm.exception.InvalidSchemaException;
 import jorm.query.executor.Executor;
 import jorm.utils.Triplet;
@@ -71,7 +72,7 @@ public class MySQLQuery<T> implements Queryable<T> {
                 T object = mapper.ToDataObject(resultSet);
                 data.add(object);
             }
-        } catch (SQLException e) {
+        } catch (SQLException | DefaultConstructorNotFoundException e) {
             e.printStackTrace();
         }
 

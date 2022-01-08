@@ -13,6 +13,10 @@ public class Weapon {
     @ForeignKey(tableName = "characters")
     public String characterId;
 
+    public Weapon() {
+        
+    }
+
     public Weapon(String id, String characterId) {
         this.id = id;
         this.characterId = characterId;

@@ -10,6 +10,10 @@ public class Skill {
     @ForeignKey(tableName = "characters")
     public String characterId;
 
+    public Skill() {
+
+    }
+
     public Skill(String id, String characterId) {
         this.id = id;
         this.characterId = characterId;

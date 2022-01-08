@@ -1,5 +1,6 @@
 import jorm.Mapper;
 import jorm.annotation.OneToMany;
+import jorm.clause.Clause;
 import jorm.connection.ConnectionFactory;
 import jorm.connection.MySQLConnection;
 import jorm.connection.configuration.MySQLConfiguration;
@@ -76,9 +77,14 @@ public class Application {
 
         MySQLQuery<Character> query = connection.CreateQuery(Character.class);
 
-        ArrayList<Weapon> weapons = new ArrayList<>();
-        weapons.add(new Weapon("5", "THAI"));
-        Character character = new Character("THAI", new Skill("4", "THAI"), weapons);
-        query.Insert(character);
+//        ArrayList<Weapon> weapons = new ArrayList<>();
+//        weapons.add(new Weapon("5", "THAI"));
+//        Character character = new Character("THAI", new Skill("4", "THAI"), weapons);
+//        query.Insert(character);
+
+        List<Character> characters = query.Where("char_name = 'CHUNLI'").Select().ToList();
+        for (Character character : characters) {
+            System.out.println(character.toString());
+        }
     }
 }
