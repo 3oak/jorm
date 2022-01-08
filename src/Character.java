@@ -2,6 +2,7 @@ import jorm.annotation.*;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Table
 public class Character {
@@ -15,7 +16,7 @@ public class Character {
     private Date createdOn;
 
     @OneToMany
-    public Skill skill;
+    public List<Skill> skill;
 
     @OneToOne
     public Weapon weapon;

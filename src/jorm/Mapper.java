@@ -1,7 +1,10 @@
 package jorm;
 
 import java.lang.annotation.AnnotationTypeMismatchException;
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -140,21 +143,18 @@ public class Mapper<T> {
                 continue;
 
             // Validate datatype of this field (throws Exception if it is primitive type)
-            if (AnnotationValidationUtils.IsPrimitiveOrString(field.getType()))
-                throw new AnnotationTypeMismatchException(
-                        null, field.getType().getName()
-                );
-
+            if(AnnotationValidationUtils.IsPrimitiveOrString(field.getType()))
+                throw new RuntimeException(String.format("Incorrectly typed data found for annotation element %s (Found data of type %s)", field.getName() ,field.getType().getName()));
+            if (!List.class.isAssignableFrom(field.getType()))
+                throw new RuntimeException("Invalid define datatype in relationship OneToMany");
+            ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
+            Class<?> actualType = (Class<?>) parameterizedType.getActualTypeArguments()[0];
+            if(AnnotationValidationUtils.IsPrimitiveOrString(actualType))
+                throw new RuntimeException(String.format("Incorrectly typed data found for annotation element %s (Found data of type %s)", field.getName() ,field.getType().getName()));
             // Validate foreign key table name of field matching with this genericClass table name
-            if (!AnnotationValidationUtils.IsForeignKeyMatching(genericClass, field.getType()))
-                throw new RuntimeException(
-                        String.format(
-                                "ForeignKey not matching between two relationship %s and %s",
-                                genericClass.getName(), field.getType().getName()
-                        )
-                );
-
-            fieldOneToMany.put(field, new Mapper<>(field.getType(), this::RaiseEventAddRelationshipQuery));
+            if(!AnnotationValidationUtils.IsForeignKeyMatching(genericClass, actualType))
+                throw new RuntimeException(String.format("ForeignKey not matching between two relationship %s and %s", genericClass.getName(), field.getType().getName()));
+            fieldOneToMany.put(field, new Mapper<>(actualType, this::RaiseEventAddRelationshipQuery));
         }
 
         return fieldOneToMany;
@@ -182,25 +182,8 @@ public class Mapper<T> {
         return data;
     }
 
-//    public <T> HashMap<String, String> DataObjectToColumnValue(T dataObject, boolean defaultValueInclude) throws IllegalAccessException{
-//        if(dataObject == null)
-//            throw new NullPointerException();
-//        HashMap<String, String> columnValueDictionary = new HashMap<>();
-//        for (Map.Entry<Field, String> item : fieldColumnDictionary.entrySet()) {
-//            if (item.getValue() == null)
-//                continue;
-//            var valueOfField = GetDataObjectOfField(item.getKey(), dataObject);
-//            if(valueOfField == null)
-//                continue;
-//            var column = item.getValue();
-//            columnValueDictionary.put(item.getValue(), valueOfField.toString());
-//        }
-//        return columnValueDictionary;
-//    }
-
-    public <N> Tuple<String, String> DataObjectToUpdateQuery(N dataObject)
-            throws IllegalAccessException {
-        if (dataObject == null)
+    public <T> Tuple<String, String> DataObjectToUpdateQuery(T dataObject) throws IllegalAccessException {
+        if(dataObject == null)
             throw new NullPointerException();
 
         StringBuilder setValueQuery = new StringBuilder();
@@ -250,25 +233,26 @@ public class Mapper<T> {
         }
 
         for (Map.Entry<Field, Mapper<?>> item : fieldOneToManyDictionary.entrySet()) {
-            var valueOfField = GetDataObjectOfField(item.getKey(), dataObject);
-
-            if (valueOfField == null)
+            var listValueOfField = GetDataObjectsOfField(item.getKey(), dataObject);
+            if(listValueOfField == null)
                 continue;
-
-            var relationshipMapper = item.getValue();
-            var relationshipUpdateQuery =
-                    relationshipMapper.DataObjectToUpdateQuery(valueOfField);
-            var relationshipConditionQuery =
-                    String.format("%s = %s",
-                            relationshipMapper.GetColumnNameForeignKeyOfType(genericClass),
-                            GetValuePrimaryKey(dataObject));
-            if (relationshipUpdateQuery == null)
-                continue;
-            RaiseEventAddRelationshipQuery(
-                    Triplet.CreateTriplet(
-                            relationshipUpdateQuery.GetHead(),
-                            relationshipUpdateQuery.GetTail(),
-                            relationshipConditionQuery));
+            for (var element : listValueOfField) {
+                var relationshipMapper = item.getValue();
+                var relationshipUpdateQuery = relationshipMapper.DataObjectToUpdateQuery(element);
+                var relationshipConditionQuery =
+                        String.format("%s = %s AND %s = %s",
+                                relationshipMapper.GetColumnNameForeignKeyOfType(genericClass),
+                                GetValuePrimaryKey(dataObject),
+                                relationshipMapper.GetColumnNamePrimaryKey(),
+                                relationshipMapper.GetValuePrimaryKey(element));
+                if(relationshipUpdateQuery == null)
+                    continue;
+                RaiseEventAddRelationshipQuery(
+                        Triplet.CreateTriplet(
+                                relationshipUpdateQuery.GetHead(),
+                                relationshipUpdateQuery.GetTail(),
+                                relationshipConditionQuery));
+            }
         }
 
         if (setValueQuery.toString().isBlank())
@@ -414,9 +398,11 @@ public class Mapper<T> {
         field.setAccessible(true);
         return field.get(dataObject);
     }
-
-    private <N, V> void SetDataObjectOfField(Field field, N dataObject, V Value)
-            throws IllegalAccessException {
+    private <T> List<T> GetDataObjectsOfField(Field field, T dataObject) throws IllegalAccessException {
+        field.setAccessible(true);
+        return (List<T>) field.get(dataObject);
+    }
+    private <T, V> void SetDataObjectOfField(Field field, T dataObject, V Value) throws IllegalAccessException {
         field.setAccessible(true);
         field.set(dataObject, Value);
     }
