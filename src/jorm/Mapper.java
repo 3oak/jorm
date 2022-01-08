@@ -202,7 +202,7 @@ public class Mapper<T> {
             var column = item.getValue();
             setValueQuery.append(
                     String.format(
-                            "%s%s = %s", isAddPrefix ? "" : ", ",
+                            "%s%s = '%s'", isAddPrefix ? "" : ", ",
                             item.getValue(), valueOfField
                     )
             );

@@ -9,7 +9,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
 import jorm.Mapper;
 import jorm.annotation.OneToMany;
@@ -186,7 +185,7 @@ public class MySQLQuery<T> implements Queryable<T> {
 
         commandList.get(0).AddCommand(
                 Tuple.CreateTuple(
-                        QueryType.VALUE,
+                        QueryType.VALUES,
                         values
                 )
         );
@@ -347,7 +346,9 @@ public class MySQLQuery<T> implements Queryable<T> {
             // Auto resource management
             connection.setAutoCommit(false);
             while (!queryList.isEmpty()) {
-                statement.executeUpdate(queryList.remove());
+                String string = queryList.toString();
+                System.out.println(string);
+                statement.executeUpdate(string);
             }
             connection.commit();
             connection.setAutoCommit(true);

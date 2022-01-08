@@ -12,5 +12,5 @@ public enum QueryType {
     OR,
     SET,
     COLUMN,
-    VALUE
+    VALUES
 }

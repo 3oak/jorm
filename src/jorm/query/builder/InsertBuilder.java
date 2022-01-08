@@ -27,15 +27,16 @@ public class InsertBuilder implements QueryBuilder {
                         isColumnExisted = true;
                     }
                     break;
-                case VALUE:
+                case VALUES:
                     if (!isValueExisted) {
-                        stringBuilder.append(" ").append("(").append(command.GetTail()).append(")");
+                        stringBuilder.append(" ").append(type).append(" ").append("(").append(command.GetTail()).append(")");
                         isValueExisted = true;
                     }
                     break;
             }
         }
 
+        System.out.println(stringBuilder.toString());
         return stringBuilder.toString();
     }
 }

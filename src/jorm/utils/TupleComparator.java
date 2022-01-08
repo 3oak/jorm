@@ -24,7 +24,7 @@ public class TupleComparator implements Comparator<Tuple<QueryType, String>> {
             case DELETE:
                 return QueryLevel.COMMANDS;
             case WHERE:
-            case VALUE:
+            case VALUES:
                 return QueryLevel.WHERE;
             case AND:
             case OR:

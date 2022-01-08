@@ -64,7 +64,7 @@ public class Application {
 
         _config
                 .SetPort("3306")
-                .SetDatabaseName("ouchtion");
+                .SetDatabaseName("test");
 
         System.out.println(_config.GetConnectionURL());
 
@@ -76,43 +76,9 @@ public class Application {
 
         MySQLQuery<Character> query = connection.CreateQuery(Character.class);
 
-        // Queryable queryable = new Queryable().Select().Where().Or().Run();
-        //Tuple<QueryType, String> tuple1 = Tuple.CreateTuple(QueryType.DELETE, "students");
-        //Tuple<QueryType, String> tuple2 = Tuple.CreateTuple(QueryType.WHERE, "a = b");
-        //Tuple<QueryType, String> tuple4 = Tuple.CreateTuple(QueryType.FIELD, "1, 2");
-        //Tuple<QueryType, String> tuple3 = Tuple.CreateTuple(QueryType.AND, "c = d");
-        Tuple<QueryType, String> tuple5 = Tuple.CreateTuple(QueryType.INSERT, "INSERT INTO TABLE");
-        Tuple<QueryType, String> tuple6 = Tuple.CreateTuple(QueryType.VALUE, "VALUE");
-        Tuple<QueryType, String> tuple8 = Tuple.CreateTuple(QueryType.COLUMN, "(COLUMN)");
-        Tuple<QueryType, String> tuple7 = Tuple.CreateTuple(QueryType.WHERE, "WHERE");
-        QueryCommand queryCommand = new QueryCommand();
-        queryCommand.AddCommand(tuple5);
-        queryCommand.AddCommand(tuple6);
-        queryCommand.AddCommand(tuple8);
-        queryCommand.AddCommand(tuple7);
-
-        while(!queryCommand.GetCommandQueue().isEmpty()) {
-            System.out.print(queryCommand.GetCommandQueue().poll().GetTail() + " ");
-        }
-
-        QueryBuilder builder = new DeleteBuilder();
-        System.out.print(builder.Build(queryCommand.GetCommandQueue()));
-        var character = new Character("HPQ", 10);
-        var skill = new Skill("skillId1", 5, "PQ");
-        var skill2 = new Skill("skillId2", 15, "PQ");
-        var skill3 = new Skill("skillId3", 25, "PQ");
-        var weapon = new Weapon();
-        var listSkill = new ArrayList<Skill>();
-        listSkill.add(skill);
-        listSkill.add(skill2);
-        listSkill.add(skill3);
-        character.skill = listSkill;
-        character.weapon = weapon;
-        //query.Update(character);
-
-        var samuel = new Character("Samuel", 100, Utils.ParseDate("2000-05-19"));
-        samuel.skill = listSkill;
-        query.Insert(samuel);
-        query.GetAllCommand();
+        ArrayList<Weapon> weapons = new ArrayList<>();
+        weapons.add(new Weapon("5", "THAI"));
+        Character character = new Character("THAI", new Skill("4", "THAI"), weapons);
+        query.Insert(character);
     }
 }

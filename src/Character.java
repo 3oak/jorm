@@ -1,51 +1,55 @@
 import jorm.annotation.*;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.ArrayList;
 
-@Table
+@Table(name="characters")
 public class Character {
-    @Column
+    @Column(name="char_name")
     @PrimaryKey
     private String name;
-    @Column
-    private int level;
-    @Column
-    @Temporal(value = TemporalType.DATE)
-    private Date createdOn;
-
-    @OneToMany
-    public List<Skill> skill;
 
     @OneToOne
-    public Weapon weapon;
+    public Skill skill;
 
-    public Character() {
+    @OneToMany
+    public ArrayList<Weapon> weapons;
 
-    }
-
-    public Character(String name, int level) {
+    public Character(String name, Skill skill, ArrayList<Weapon> weapons) {
         this.name = name;
-        this.level = level;
-        this.createdOn = null;
-    }
-
-    public Character(String name, int level, Date createdOn) {
-        this.name = name;
-        this.level = level;
-        this.createdOn = createdOn;
+        this.skill = skill;
+        this.weapons = weapons;
     }
 
     public String getName() {
         return name;
     }
 
-    public int getLevel() {
-        return level;
+    public Skill getSkill() {
+        return skill;
     }
 
-    public Date getCreatedOn() {
-        return createdOn;
+    public ArrayList<Weapon> getWeapons() {
+        return weapons;
+    }
+
+    @Override
+    public String toString() {
+        return "Character{" +
+                "name='" + name + '\'' +
+                ", skill=" + skill +
+                ", weapons=" + weapons +
+                '}';
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setSkill(Skill skill) {
+        this.skill = skill;
+    }
+
+    public void setWeapons(ArrayList<Weapon> weapons) {
+        this.weapons = weapons;
     }
 }
