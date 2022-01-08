@@ -19,6 +19,7 @@ import jorm.query.QueryType;
 import jorm.utils.AnnotationValidationUtils;
 import jorm.utils.Triplet;
 import jorm.utils.Tuple;
+import jorm.utils.Utils;
 
 @SuppressWarnings("unused")
 public class Mapper<T> {
@@ -188,7 +189,7 @@ public class Mapper<T> {
         return data;
     }
 
-    public <T> Tuple<String, String> DataObjectToUpdateQuery(T dataObject) throws IllegalAccessException {
+    public <T> Tuple<String, String> DataObjectToUpdateQuery(T dataObject) throws IllegalAccessException, InvalidSchemaException {
         if(dataObject == null)
             throw new NullPointerException();
 
@@ -199,17 +200,15 @@ public class Mapper<T> {
         for (Map.Entry<Field, String> item : fieldColumnDictionary.entrySet()) {
             if (item.getValue() == null)
                 continue;
-
             var valueOfField = GetDataObjectOfField(item.getKey(), dataObject);
-
             if (valueOfField == null)
                 continue;
 
             var column = item.getValue();
             setValueQuery.append(
                     String.format(
-                            "%s%s = '%s'", isAddPrefix ? "" : ", ",
-                            item.getValue(), valueOfField
+                            "%s%s = %s", isAddPrefix ? "" : ", ",
+                            item.getValue(), Utils.ToStringQueryValue(valueOfField)
                     )
             );
 
@@ -226,9 +225,9 @@ public class Mapper<T> {
             var relationshipUpdateQuery =
                     relationshipMapper.DataObjectToUpdateQuery(valueOfField);
             var relationshipConditionQuery =
-                    String.format("%s = '%s'",
+                    String.format("%s = %s",
                             relationshipMapper.GetColumnNameForeignKeyOfType(genericClass),
-                            GetValuePrimaryKey(dataObject));
+                            Utils.ToStringQueryValue(GetValuePrimaryKey(dataObject)));
             if (relationshipUpdateQuery == null)
                 continue;
             RaiseEventAddRelationshipQuery(
@@ -246,11 +245,11 @@ public class Mapper<T> {
                 var relationshipMapper = item.getValue();
                 var relationshipUpdateQuery = relationshipMapper.DataObjectToUpdateQuery(element);
                 var relationshipConditionQuery =
-                        String.format("%s = '%s' AND %s = '%s'",
+                        String.format("%s = %s AND %s = %s",
                                 relationshipMapper.GetColumnNameForeignKeyOfType(genericClass),
-                                GetValuePrimaryKey(dataObject),
+                                Utils.ToStringQueryValue(GetValuePrimaryKey(dataObject)),
                                 relationshipMapper.GetColumnNamePrimaryKey(),
-                                relationshipMapper.GetValuePrimaryKey(element));
+                                Utils.ToStringQueryValue(relationshipMapper.GetValuePrimaryKey(element)));
                 if(relationshipUpdateQuery == null)
                     continue;
                 RaiseEventAddRelationshipQuery(
@@ -264,6 +263,41 @@ public class Mapper<T> {
         if (setValueQuery.toString().isBlank())
             return null;
         return setValueQuery.toString().isBlank() ? null : Tuple.CreateTuple(tableName, setValueQuery.toString());
+    }
+
+    public <T1, T2> Triplet<String, String, Boolean> DataObjectToUpdateQueryForInsert(T1 dataObject, T2 parentDataObject, Mapper<?> parentMapper) throws IllegalAccessException {
+        if(dataObject == null)
+            throw new NullPointerException();
+
+        StringBuilder setValueQuery = new StringBuilder();
+        boolean isAddPrefix = true;
+        boolean whereConditionInclude = true;
+
+        // Create update query for primitive datatype column (without relationship)
+        for (Map.Entry<Field, String> item : fieldColumnDictionary.entrySet()) {
+            if (item.getValue() == null)
+                continue;
+            if(!AnnotationValidationUtils.IsAnnotationPresent(item.getKey(), ForeignKey.class))
+                continue;
+            var valueOfField = GetDataObjectOfField(item.getKey(), dataObject);
+            if(parentDataObject != null){
+                valueOfField = parentMapper.GetValuePrimaryKey(parentDataObject);
+                whereConditionInclude = false;
+            }
+            if (valueOfField == null)
+                continue;
+            var column = item.getValue();
+            setValueQuery.append(
+                    String.format(
+                            "%s%s = %s", isAddPrefix ? "" : ", ",
+                            item.getValue(), Utils.ToStringQueryValue(valueOfField)
+                    )
+            );
+            isAddPrefix = false;
+        }
+        if (setValueQuery.toString().isBlank())
+            return null;
+        return setValueQuery.toString().isBlank() ? null : Triplet.CreateTriplet(tableName, setValueQuery.toString(), whereConditionInclude);
     }
 
     public Tuple<String, String> GetPairColumnValue(T dataObject)
@@ -390,6 +424,8 @@ public class Mapper<T> {
             Field field = item.getKey();
             field.setAccessible(true);
 
+            if(field.get(dataObject) == null)
+                return null;
             return field.get(dataObject).toString();
         }
 

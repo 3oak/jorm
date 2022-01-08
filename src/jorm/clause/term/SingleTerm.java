@@ -1,5 +1,8 @@
 package jorm.clause.term;
 
+import jorm.utils.AnnotationValidationUtils;
+import jorm.utils.Utils;
+
 @SuppressWarnings("unused")
 public class SingleTerm<T> implements Term {
     private final T genericData;
@@ -10,6 +13,6 @@ public class SingleTerm<T> implements Term {
 
     @Override
     public String ToQueryString() {
-        return String.format("'%s'", genericData.toString());
+        return String.format("%s", Utils.ToStringQueryValue(genericData.toString()));
     }
 }
