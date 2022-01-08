@@ -97,7 +97,11 @@ public class MySQLQuery<T> implements Queryable<T> {
 //
                 Tuple<Field, String> f = this.mapper.GetFieldWithRelationship(preload.GetHead());
                 if (f.GetTail().equals(OneToOne.class.getName())) {
-                    f.GetHead().set(d, dt.get(0));
+                    if (dt.size() == 0) {
+                        f.GetHead().set(d, null);
+                    } else {
+                        f.GetHead().set(d, dt.get(0));
+                    }
                 } else if (f.GetTail().equals(OneToMany.class.getName())) {
                     f.GetHead().set(d, dt);
                 }
