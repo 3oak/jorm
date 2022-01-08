@@ -82,32 +82,31 @@ public class MySQLQuery<T> implements Queryable<T> {
             String primaryKeyValue = (String) primaryKey.get(d);
 
             for (var preload : waitingPreloads) {
-                QueryCommand command = preload.GetTail();
+                QueryCommand command = preload.GetTail().clone();
                 command.AddCommand(Tuple.CreateTuple(QueryType.WHERE, preload.GetMid() + " = " + "'" + primaryKeyValue + "'"));
 
-                ArrayList<T> dt = new ArrayList<>();
+                var dt = new ArrayList<>();
 
                 try (Statement statement = connection.createStatement()) {
                     // Auto resource management
                     ResultSet rs = statement.executeQuery(command.GetExecuteQuery());
                     while (rs.next()) {
-//                        Mapper<?> sub_mapper = new Mapper<>(preload.GetHead(), null);
-                        T object = mapper.ToDataObject(rs);
+                        var sub_mapper = new Mapper<>(preload.GetHead(), null);
+                        var object = preload.GetHead().cast(preload.GetHead().getConstructor().newInstance());
+                        object = sub_mapper.ToDataObject(rs);
                         dt.add(object);
                     }
-                } catch (SQLException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
-                    return null;
+                    return new QueryData<>(data);
                 }
 //
                 Tuple<Field, String> f = this.mapper.GetFieldWithRelationship(preload.GetHead());
-                if (f.GetTail().equals(OneToOne.class.toString())) {
+                if (f.GetTail().equals(OneToOne.class.getName())) {
                     f.GetHead().set(d, dt.get(0));
-                } else if (f.GetTail().equals(OneToMany.class.toString())) {
+                } else if (f.GetTail().equals(OneToMany.class.getName())) {
                     f.GetHead().set(d, dt);
                 }
-
-//                System.out.println(preload.GetTail());
             }
         }
 

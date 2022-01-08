@@ -489,10 +489,10 @@ public class Mapper<T> {
                     relationship = OneToMany.class.getName();
                 }
             }
+        }
 
-            if (field == null) {
-                throw new InvalidSchemaException("Relationship annotation", hasRelationshipWith.getName());
-            }
+        if (field == null) {
+            throw new InvalidSchemaException("Relationship annotation", hasRelationshipWith.getName());
         }
 
         return Tuple.CreateTuple(field, relationship);
