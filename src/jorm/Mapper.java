@@ -220,7 +220,7 @@ public class Mapper<T> {
             var relationshipUpdateQuery =
                     relationshipMapper.DataObjectToUpdateQuery(valueOfField);
             var relationshipConditionQuery =
-                    String.format("%s = %s",
+                    String.format("%s = '%s'",
                             relationshipMapper.GetColumnNameForeignKeyOfType(genericClass),
                             GetValuePrimaryKey(dataObject));
             if (relationshipUpdateQuery == null)
@@ -240,7 +240,7 @@ public class Mapper<T> {
                 var relationshipMapper = item.getValue();
                 var relationshipUpdateQuery = relationshipMapper.DataObjectToUpdateQuery(element);
                 var relationshipConditionQuery =
-                        String.format("%s = %s AND %s = %s",
+                        String.format("%s = '%s' AND %s = '%s'",
                                 relationshipMapper.GetColumnNameForeignKeyOfType(genericClass),
                                 GetValuePrimaryKey(dataObject),
                                 relationshipMapper.GetColumnNamePrimaryKey(),

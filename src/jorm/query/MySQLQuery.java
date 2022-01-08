@@ -192,6 +192,7 @@ public class MySQLQuery<T> implements Queryable<T> {
 
         var pairRelationshipInstanceMappers =
                 mapper.GetOneToOneRelationshipInstances(dataObject);
+        var valuePrimaryKey = mapper.GetDataObjectOfField(mapper.GetPrimaryKey(), dataObject);
         for (var pairRelationshipInstanceMapper : pairRelationshipInstanceMappers.entrySet()) {
             var instance = pairRelationshipInstanceMapper.getKey();
             var onetooneMapper = pairRelationshipInstanceMapper.getValue();
@@ -210,7 +211,14 @@ public class MySQLQuery<T> implements Queryable<T> {
                             queryTuple.GetTail()
                     )
             );
-
+            queryCommand.AddCommand(
+                    Tuple.CreateTuple(
+                            QueryType.WHERE,
+                            String.format("%s = '%s'",
+                                    onetooneMapper.GetColumnNameForeignKeyOfType(mapper.GetGenericClass()),
+                                    valuePrimaryKey)
+                    )
+            );
             commandList.add(queryCommand);
         }
 
@@ -221,10 +229,10 @@ public class MySQLQuery<T> implements Queryable<T> {
             var listInstance = pairRelationshipListInstanceMapper.getKey();
             var onetoomanyMapper = pairRelationshipListInstanceMapper.getValue();
             var whereQueryString =
-                            String.format("%s = %s",
+                            String.format("%s = '%s'",
                             onetoomanyMapper.GetColumnNameForeignKeyOfType(mapper.GetGenericClass()),
                             mapper.GetDataObjectOfField(mapper.GetPrimaryKey(), dataObject));
-            var instanceColumnNamePrimaryKey =onetoomanyMapper.GetColumnNamePrimaryKey();
+            var instanceColumnNamePrimaryKey = onetoomanyMapper.GetColumnNamePrimaryKey();
             var instanceFieldPrimaryKey = onetoomanyMapper.GetPrimaryKey();
             for (var instance : listInstance) {
                 var queryTuple = onetoomanyMapper.DataObjectToUpdateQuery(instance);
@@ -250,7 +258,7 @@ public class MySQLQuery<T> implements Queryable<T> {
                 queryCommand.AddCommand(
                         Tuple.CreateTuple(
                                 QueryType.AND,
-                                String.format("%s = %s",
+                                String.format("%s = '%s'",
                                         instanceColumnNamePrimaryKey,
                                         onetoomanyMapper.GetDataObjectOfField(instanceFieldPrimaryKey, instance))
                         )
@@ -339,16 +347,18 @@ public class MySQLQuery<T> implements Queryable<T> {
 
     private void ExecuteCommandQuery(){
         var queryList = new LinkedList<String>();
-        for (var command : commandList)
+        for (var command : commandList){
+            System.out.println(command.GetExecuteQuery());
             queryList.add(command.GetExecuteQuery());
+        }
 
         try (Statement statement = connection.createStatement()) {
             // Auto resource management
             connection.setAutoCommit(false);
             while (!queryList.isEmpty()) {
-                String string = queryList.toString();
-                System.out.println(string);
-                statement.executeUpdate(string);
+                var queryString = queryList.pop();
+                //System.out.println(queryString);
+                statement.executeUpdate(queryString);
             }
             connection.commit();
             connection.setAutoCommit(true);
