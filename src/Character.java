@@ -14,6 +14,10 @@ public class Character {
     @OneToMany
     public ArrayList<Weapon> weapons;
 
+    public Character() {
+
+    }
+
     public Character(String name, Skill skill, ArrayList<Weapon> weapons) {
         this.name = name;
         this.skill = skill;
