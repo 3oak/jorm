@@ -83,4 +83,12 @@ public class Utils {
             throws ParseException {
         return new SimpleDateFormat("yyyy-MM-dd HH-mm-ss").parse(datetime);
     }
+
+    public static String ToStringQueryValue(Object object){
+        if(object == null)
+            return null;
+        if(AnnotationValidationUtils.IsPrimitive(object.getClass()))
+            return object.toString();
+        return String.format("'%s'", object.toString());
+    }
 }

@@ -32,6 +32,6 @@ public interface Queryable<T> {
             throws Exception;
 
     void Update(T data)
-            throws IllegalAccessException;
+            throws IllegalAccessException, InvalidSchemaException;
 
 }

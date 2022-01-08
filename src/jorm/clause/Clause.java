@@ -1,6 +1,6 @@
 package jorm.clause;
 
-public class Clause {
+public abstract class Clause {
     protected String propertyName;
     protected ComparisonOperator comparisonOperator;
 

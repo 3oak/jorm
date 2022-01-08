@@ -42,4 +42,10 @@ public class AnnotationValidationUtils {
     public static boolean IsPrimitiveOrString(Class<?> validateClass) {
         return Number.class.isAssignableFrom(validateClass) || validateClass.isPrimitive() || CharSequence.class.isAssignableFrom(validateClass);
     }
+    public static boolean IsPrimitive(Class<?> validateClass){
+        return Number.class.isAssignableFrom(validateClass) || validateClass.isPrimitive();
+    }
+    public static boolean IsString(Class<?> validateClass){
+        return CharSequence.class.isAssignableFrom(validateClass);
+    }
 }

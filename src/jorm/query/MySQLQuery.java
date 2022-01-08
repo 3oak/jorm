@@ -18,6 +18,7 @@ import jorm.exception.DefaultConstructorNotFoundException;
 import jorm.exception.InvalidSchemaException;
 import jorm.utils.Triplet;
 import jorm.utils.Tuple;
+import jorm.utils.Utils;
 
 @SuppressWarnings("unused")
 public class MySQLQuery<T> implements Queryable<T> {
@@ -188,27 +189,29 @@ public class MySQLQuery<T> implements Queryable<T> {
         for (var pairRelationshipInstanceMapper : pairRelationshipInstanceMappers.entrySet()) {
             var instance = pairRelationshipInstanceMapper.getKey();
             var onetooneMapper = pairRelationshipInstanceMapper.getValue();
+            var queryTriplet = onetooneMapper.DataObjectToUpdateQueryForInsert(instance, dataObject, mapper);
+            var conditionQuery =
+                    String.format("%s = %s",
+                    onetooneMapper.GetColumnNamePrimaryKey(),
+                    Utils.ToStringQueryValue(onetooneMapper.GetDataObjectOfField(onetooneMapper.GetPrimaryKey(), instance)));
 
-            var queryTuple = onetooneMapper.DataObjectToUpdateQuery(instance);
             var queryCommand = new QueryCommand();
             queryCommand.AddCommand(
                     Tuple.CreateTuple(
                             QueryType.UPDATE,
-                            queryTuple.GetHead()
+                            queryTriplet.GetHead()
                     )
             );
             queryCommand.AddCommand(
                     Tuple.CreateTuple(
                             QueryType.SET,
-                            queryTuple.GetTail()
+                            queryTriplet.GetMid()
                     )
             );
             queryCommand.AddCommand(
                     Tuple.CreateTuple(
                             QueryType.WHERE,
-                            String.format("%s = '%s'",
-                                    onetooneMapper.GetColumnNameForeignKeyOfType(mapper.GetGenericClass()),
-                                    valuePrimaryKey)
+                            conditionQuery
                     )
             );
             commandList.add(queryCommand);
@@ -221,40 +224,42 @@ public class MySQLQuery<T> implements Queryable<T> {
             var listInstance = pairRelationshipListInstanceMapper.getKey();
             var onetoomanyMapper = pairRelationshipListInstanceMapper.getValue();
             var whereQueryString =
-                            String.format("%s = '%s'",
+                            String.format("%s = %s",
                             onetoomanyMapper.GetColumnNameForeignKeyOfType(mapper.GetGenericClass()),
-                            mapper.GetDataObjectOfField(mapper.GetPrimaryKey(), dataObject));
+                            Utils.ToStringQueryValue(mapper.GetDataObjectOfField(mapper.GetPrimaryKey(), dataObject)));
             var instanceColumnNamePrimaryKey = onetoomanyMapper.GetColumnNamePrimaryKey();
             var instanceFieldPrimaryKey = onetoomanyMapper.GetPrimaryKey();
             for (var instance : listInstance) {
-                var queryTuple = onetoomanyMapper.DataObjectToUpdateQuery(instance);
+                var queryTriplet = onetoomanyMapper.DataObjectToUpdateQueryForInsert(instance, dataObject, mapper);
                 var queryCommand = new QueryCommand();
                 queryCommand.AddCommand(
                         Tuple.CreateTuple(
                                 QueryType.UPDATE,
-                                queryTuple.GetHead()
+                                queryTriplet.GetHead()
                         )
                 );
                 queryCommand.AddCommand(
                         Tuple.CreateTuple(
                                 QueryType.SET,
-                                queryTuple.GetTail()
+                                queryTriplet.GetMid()
                         )
                 );
                 queryCommand.AddCommand(
                         Tuple.CreateTuple(
                                 QueryType.WHERE,
-                                whereQueryString
-                        )
-                );
-                queryCommand.AddCommand(
-                        Tuple.CreateTuple(
-                                QueryType.AND,
-                                String.format("%s = '%s'",
+                                String.format("%s = %s",
                                         instanceColumnNamePrimaryKey,
-                                        onetoomanyMapper.GetDataObjectOfField(instanceFieldPrimaryKey, instance))
+                                        Utils.ToStringQueryValue(onetoomanyMapper.GetDataObjectOfField(instanceFieldPrimaryKey, instance)))
                         )
                 );
+                if(queryTriplet.GetTail()){
+                    queryCommand.AddCommand(
+                            Tuple.CreateTuple(
+                                    QueryType.AND,
+                                    whereQueryString
+                            )
+                    );
+                }
                 commandList.add(queryCommand);
             }
         }
@@ -274,7 +279,7 @@ public class MySQLQuery<T> implements Queryable<T> {
 
     @Override
     public void Update(T data)
-          throws IllegalAccessException {
+            throws IllegalAccessException, InvalidSchemaException {
         var query = mapper.DataObjectToUpdateQuery(data);
         if(query == null)
             return;
@@ -350,7 +355,7 @@ public class MySQLQuery<T> implements Queryable<T> {
             System.out.println(queryList.size());
             while (!queryList.isEmpty()) {
                 var queryString = queryList.poll();
-                //System.out.println(queryString);
+                System.out.println(queryString);
                 statement.executeUpdate(queryString);
             }
             connection.commit();
