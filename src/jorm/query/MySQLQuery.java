@@ -16,7 +16,6 @@ import jorm.annotation.OneToOne;
 import jorm.clause.Clause;
 import jorm.exception.DefaultConstructorNotFoundException;
 import jorm.exception.InvalidSchemaException;
-import jorm.query.executor.Executor;
 import jorm.utils.Triplet;
 import jorm.utils.Tuple;
 
@@ -28,10 +27,6 @@ public class MySQLQuery<T> implements Queryable<T> {
 
     private final List<QueryCommand> commandList;
     private final List<Triplet<Class<?>, String, QueryCommand>> waitingPreloads;
-
-    //private final List<String> queryList;
-
-    private final Executor executor;
 
     public MySQLQuery(Class<T> genericClass, Connection connection)
             throws RuntimeException {
@@ -47,14 +42,10 @@ public class MySQLQuery<T> implements Queryable<T> {
         commandList.add(new QueryCommand());
 
         //this.queryList = new ArrayList<>();
-        this.executor = new Executor(connection);
     }
 
     @Override
-    public QueryData<T> Select() throws SQLException, NoSuchFieldException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException, InvalidSchemaException {
-//        for (Triplet<Class<?>, String, QueryCommand> test : waitingPreloads) {
-//            System.out.println(test.GetMid());
-//        }
+    public QueryData<T> Select() throws SQLException, NoSuchFieldException, InvocationTargetException, InstantiationException, IllegalAccessException, InvalidSchemaException {
 
         commandList.get(0).AddCommand(
                 Tuple.CreateTuple(
