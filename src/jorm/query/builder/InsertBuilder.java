@@ -36,7 +36,6 @@ public class InsertBuilder implements QueryBuilder {
             }
         }
 
-        System.out.println(stringBuilder.toString());
         return stringBuilder.toString();
     }
 }

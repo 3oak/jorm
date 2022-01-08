@@ -349,15 +349,16 @@ public class MySQLQuery<T> implements Queryable<T> {
     private void ExecuteCommandQuery(){
         var queryList = new LinkedList<String>();
         for (var command : commandList){
-            System.out.println(command.GetExecuteQuery());
-            queryList.add(command.GetExecuteQuery());
+            String exeQuery = command.GetExecuteQuery();
+            queryList.add(exeQuery);
         }
 
         try (Statement statement = connection.createStatement()) {
             // Auto resource management
             connection.setAutoCommit(false);
+            System.out.println(queryList.size());
             while (!queryList.isEmpty()) {
-                var queryString = queryList.pop();
+                var queryString = queryList.poll();
                 //System.out.println(queryString);
                 statement.executeUpdate(queryString);
             }
