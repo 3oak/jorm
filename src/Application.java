@@ -1,3 +1,5 @@
+import jorm.Mapper;
+import jorm.annotation.OneToMany;
 import jorm.connection.ConnectionFactory;
 import jorm.connection.MySQLConnection;
 import jorm.connection.configuration.MySQLConfiguration;
@@ -6,8 +8,15 @@ import jorm.query.QueryCommand;
 import jorm.query.QueryType;
 import jorm.query.builder.DeleteBuilder;
 import jorm.query.builder.QueryBuilder;
+import jorm.utils.AnnotationValidationUtils;
 import jorm.utils.Tuple;
 import jorm.utils.Utils;
+
+import java.lang.annotation.AnnotationTypeMismatchException;
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Application {
     public static void main(String[] args)
@@ -50,7 +59,7 @@ public class Application {
         MySQLConfiguration _config = new MySQLConfiguration();
         _config
                 .SetUsername("root")
-                .SetPassword("5091Nephilim7031;")
+                .SetPassword("root")
                 .SetHostName("localhost");
 
         _config
@@ -90,8 +99,14 @@ public class Application {
         System.out.print(builder.Build(queryCommand.GetCommandQueue()));
         var character = new Character("HPQ", 10);
         var skill = new Skill("skillId1", 5, "PQ");
+        var skill2 = new Skill("skillId2", 15, "PQ");
+        var skill3 = new Skill("skillId3", 25, "PQ");
         var weapon = new Weapon();
-        character.skill = skill;
+        var listSkill = new ArrayList<Skill>();
+        listSkill.add(skill);
+        listSkill.add(skill2);
+        listSkill.add(skill3);
+        character.skill = listSkill;
         character.weapon = weapon;
         query.Update(character);
 
