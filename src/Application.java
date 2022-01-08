@@ -108,10 +108,11 @@ public class Application {
         listSkill.add(skill3);
         character.skill = listSkill;
         character.weapon = weapon;
-        query.Update(character);
+        //query.Update(character);
 
         var samuel = new Character("Samuel", 100, Utils.ParseDate("2000-05-19"));
-
+        samuel.skill = listSkill;
         query.Insert(samuel);
+        query.GetAllCommand();
     }
 }
